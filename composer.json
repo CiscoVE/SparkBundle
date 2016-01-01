@@ -3,6 +3,7 @@
     "type": "symfony-bundle",
     "description": "Symfony bundle for Cisco Spark Application API's",
     "keywords": ["Spark", "CiscoSpark", "Cisco"],
+    "homepage": "https://developer.ciscospark.com",
     "license": "MIT",
     "authors": [
         {
@@ -17,7 +18,9 @@
         "guzzlehttp/guzzle" : "v5.3.0"
     },
     "autoload": {
-        "psr-0": { "CiscoSystems\\SalesforceBundle": "" }
+        "psr-4": {
+            "CiscoSystems\\SparkBundle": "src/"
+        }
     },
     "target-dir": "CiscoSystems/SparkBundle"
 }
