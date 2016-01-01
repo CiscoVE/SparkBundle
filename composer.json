@@ -19,7 +19,7 @@
     },
     "autoload": {
         "psr-0": {
-            "CiscoSystems\\SparkBundle": "src/"
+            "CiscoSystems\\SparkBundle": ""
         }
     },
     "target-dir": "CiscoSystems/SparkBundle"
