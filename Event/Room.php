@@ -9,7 +9,7 @@ class Room  {
 	
 	CONST ROOMURI   = 'https://api.ciscospark.com/v1/rooms/';
 	
-	public function CreateRoom($title = "New Room")
+	public function createRoom($title = "New Room")
 	{
 		$roomJson = '{"title":"'.$title.'"}';
 		
