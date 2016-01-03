@@ -10,7 +10,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
     	$treeBuilder = new TreeBuilder();
-    	$node = $treeBuilder->root( 'cisco_spark' );
+    	$node = $treeBuilder->root( 'cisco_systems_spark' );
     	
     	$node->children()
     	     ->scalarNode( 'granttype' )->isRequired()->cannotBeEmpty()->end()
