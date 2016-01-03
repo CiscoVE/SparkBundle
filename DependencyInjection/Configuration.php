@@ -16,6 +16,7 @@ class Configuration implements ConfigurationInterface
     	     ->scalarNode( 'granttype' )->isRequired()->cannotBeEmpty()->end()
     		 ->scalarNode( 'machine_id' )->isRequired()->cannotBeEmpty()->end()
     	     ->scalarNode( 'machine_secret' )->isRequired()->cannotBeEmpty()->end()
+    	     ->scalarNode( 'machine_org' )->end()
     	     ->scalarNode( 'client_id' )->isRequired()->cannotBeEmpty()->end()
     	     ->scalarNode( 'client_secret' )->isRequired()->cannotBeEmpty()->end();
     	
