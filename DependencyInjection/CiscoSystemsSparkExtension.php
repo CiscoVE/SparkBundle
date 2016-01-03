@@ -17,7 +17,7 @@ class CiscoSystemsSparkExtension extends Extension
         $configuration = new Configuration();
         $processedConfig = $this->processConfiguration( $configuration, $configs );
         
-        $container->setParameter( 'CiscoSpark.client_id', $processedConfig[ 'client_id' ]);
+        $container->setParameter( 'cisco_systems_spark.client_id', $processedConfig[ 'client_id' ]);
         
         // Services
         $loader = new YamlFileLoader( $container, new FileLocator( __DIR__ . '/../Resources/config' ));
