@@ -26,6 +26,7 @@ class CiscoSystemsSparkExtension extends Extension
         $container->setParameter( 'cisco.spark.config', $config );
         $container->setParameter( 'cisco.spark.client_id', $config['client_id'] );
         
+        
     }
     
   

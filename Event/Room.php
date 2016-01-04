@@ -21,9 +21,7 @@ class Room  {
 	}
 	
 	public function getAccessToken()
-	{
-	
-		
+	{	
 		
 	}
 	
