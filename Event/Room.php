@@ -4,8 +4,6 @@ namespace CiscoSystems\SparkBundle\Event;
 use \GuzzleHttp\Client;
 use \GuzzleHttp\Exception\RequestException;
 use \GuzzleHttp\Psr7\Request;
-use \GuzzleHttp\Psr7\Uri;
-use Doctrine\ORM\EntityManager;
 use CiscoSystems\SparkBundle\Authentication\Oauth;
 
 
@@ -20,18 +18,24 @@ class Room  {
 		$this->oauth    = $oauth;
 		
 	}
-
+	
+	public function getBaseHeaders()
+	{
+		return array('Authorization' => $this->oauth->getStoredToken(),'content-type'  => 'application/json');		
+	}
+	
+	public function getRefreshHeaders()
+	{
+		return array('Authorization' => $this->oauth->getNewToken(),'content-type'  => 'application/json');
+	}
+	
 	public function createRoom($title = "New Room")
 	{
 		$roomJson = '{"title":"'.$title.'"}';
 		
-		$client = new Client();
-		$baseRequest = new \GuzzleHttp\Psr7\Request("POST", self::ROOMURI, [
-    									'Authorization' => $this->oauth->getStoredToken(),
-    									'Content-Type'  => 'application/json',
-		], $roomJson );
-	
-
+		$client      = new Client();
+		$baseRequest = new \GuzzleHttp\Psr7\Request("POST", self::ROOMURI, $this->getBaseHeaders() , $roomJson );
+		
 		try{
 			$response = $client->send($baseRequest);
 		} catch (RequestException $e) {
@@ -45,27 +49,19 @@ class Room  {
           	} 
 
 		}
-
-		$jsonResponse =  $response->getBody();
 		
-		return $jsonResponse->id;
-
+		return json_decode($response->getBody());
 	}
 	
-	public function updateRoom($rid = null, $showSipAddress = 'FALSE')
+	public function getRoomDetails($rid = null, $showSipAddress = 'FALSE')
 	{
-	
-		$baseHeaders    = array('Authorization' => $this->oauth->getStoredToken(),'content-type'  => 'application/json');
-	    $refreshHeaders = array('Authorization' => $this->oauth->getNewToken(),'content-type'  => 'application/json');
 		$queryParams    = array('showSipAddress' => $showSipAddress );
 		
-		
 		$client = new Client(['base_uri' => self::ROOMURI]);
-
-
+		
 		try{
 			$response = $client->request('GET', $rid, array(
-				'headers'       => $baseHeaders,
+				'headers'       => $this->getBaseHeaders(),
 				'query'         => $queryParams
 			));
 		} catch (RequestException $e) {
@@ -73,19 +69,62 @@ class Room  {
 			$statusCode = $e->getResponse()->getStatusCode();
 			if ($statusCode == '401')
 			{
-	
 				$response = $client->request('GET', $rid, array(
-				'headers'       => $refreshHeaders,
+				'headers'       => $this->getRefreshHeaders(),
 				'query'         => $queryParams
 				));
 			}
 	
 		}
 	
-		$jsonResponse =  json_decode($response->getBody());
-		print_r($jsonResponse);
-	
+		return json_decode($response->getBody());
 	}
-
+    
+	public function updateRoom( $rid = null, $title = 'Default Room Title' )
+	{
+		$roomJson = '{"title":"'.$title.'"}';
+		$client   = new Client(['base_uri' => self::ROOMURI]);
+		
+		try{
+			$response = $client->request('PUT', $rid, array(
+					'headers'       => $this->getBaseHeaders(),
+					'body'          => $roomJson
+			));
+		} catch (RequestException $e) {
+		
+			$statusCode = $e->getResponse()->getStatusCode();
+			if ($statusCode == '401')
+			{
+				$response = $client->request('PUT', $rid, array(
+						'headers' => $this->getRefreshHeaders(),
+						'body'    => $roomJson
+				));
+			}
+		
+		}
+		return json_decode($response->getBody());
+	}
+	
+	public function deleteRoom( $rid = null )
+	{
+		$client   = new Client(['base_uri' => self::ROOMURI]);
+	
+		try{
+			$response = $client->request('DELETE', $rid, array(
+					'headers'       => $this->getBaseHeaders()
+			));
+		} catch (RequestException $e) {
+	
+			$statusCode = $e->getResponse()->getStatusCode();
+			if ($statusCode == '401')
+			{
+				$response = $client->request('DELETE', $rid, array(
+						'headers' => $this->getRefreshHeaders()
+				));
+			}
+	
+		}
+		return json_decode($response->getBody());
+	}
 
 }
