@@ -4,6 +4,7 @@ namespace CiscoSystems\SparkBundle\Event;
 use \GuzzleHttp\Client;
 use \GuzzleHttp\Exception\RequestException;
 use \GuzzleHttp\Psr7\Request;
+use \GuzzleHttp\Psr7\Uri;
 use Doctrine\ORM\EntityManager;
 use CiscoSystems\SparkBundle\Authentication\Oauth;
 
@@ -51,7 +52,40 @@ class Room  {
 
 	}
 	
+	public function updateRoom($rid = null, $showSipAddress = 'FALSE')
+	{
 	
+		$baseHeaders    = array('Authorization' => $this->oauth->getStoredToken(),'content-type'  => 'application/json');
+	    $refreshHeaders = array('Authorization' => $this->oauth->getNewToken(),'content-type'  => 'application/json');
+		$queryParams    = array('showSipAddress' => $showSipAddress );
+		
+		
+		$client = new Client(['base_uri' => self::ROOMURI]);
+
+
+		try{
+			$response = $client->request('GET', $rid, array(
+				'headers'       => $baseHeaders,
+				'query'         => $queryParams
+			));
+		} catch (RequestException $e) {
+	
+			$statusCode = $e->getResponse()->getStatusCode();
+			if ($statusCode == '401')
+			{
+	
+				$response = $client->request('GET', $rid, array(
+				'headers'       => $refreshHeaders,
+				'query'         => $queryParams
+				));
+			}
+	
+		}
+	
+		$jsonResponse =  json_decode($response->getBody());
+		print_r($jsonResponse);
+	
+	}
 
 
 }

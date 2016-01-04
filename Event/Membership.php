@@ -3,7 +3,6 @@ namespace CiscoSystems\SparkBundle\Event;
 
 use \GuzzleHttp\Client;
 use \GuzzleHttp\Exception\RequestException;
-use \GuzzleHttp\Psr7\Request;
 use CiscoSystems\SparkBundle\Authentication\Oauth;
 
 class Membership  {
@@ -21,18 +20,17 @@ class Membership  {
 	public function getMemberships($roomId = null, $personId = null, $personEmail = null, $max = null)
 	{
 		
-	    $client = new Client();
-		$baseRequest = new \GuzzleHttp\Psr7\Request("POST", self::MEMBERSHIPURI, [
-				'Authorization' => $this->oauth->getStoredToken(),
-				'Content-Type'  => 'application/json',
-				'query'         => []
-		] );
-
+	    $baseHeaders    = array('Authorization' => $this->oauth->getStoredToken(),'content-type'  => 'application/json');
+	    $refreshHeaders = array('Authorization' => $this->oauth->getNewToken(),'content-type'  => 'application/json');
+		$queryParams    = array("roomId" => $roomId, "personId" => $personId, "personEmail" => $personEmail, "max" => $max );
 		
-	
-	
+		$client  = new Client();
+
 		try{
-			$response = $client->send($baseRequest);
+		$response = $client->request("GET", self::MEMBERSHIPURI, array(
+				'headers'       => $baseHeaders,
+				'query'         => $queryParams
+		));
 		} catch (RequestException $e) {
 	
 			$statusCode = $e->getResponse()->getStatusCode();
@@ -40,15 +38,17 @@ class Membership  {
 			if ($statusCode == '401')
 			{
 	
-				$request  = $baseRequest->withHeader('Authorization', $this->oauth->getNewToken());
-				$response = $client->send($request);
+				$response = $client->request("GET", self::MEMBERSHIPURI, array(
+				'headers'       => $refreshHeaders,
+				'query'         => $queryParams
+				));
 			}
 	
 		}
-		 
-		$jsonResponse =  $response->getBody();
-		echo $jsonResponse;
-		return ''; //$jsonResponse->id;
+		
+		$jsonResponse =  json_decode($response->getBody());
+		
+		return $jsonResponse;
 	
 	}
 	
