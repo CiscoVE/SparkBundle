@@ -3,6 +3,8 @@ namespace CiscoSystems\SparkBundle\Authentication;
 
 use \GuzzleHttp\Client;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Doctrine\ORM\EntityManager;
+use CiscoSystems\SparkBundle\Entity\Token as SparkToken;
 
 
 
@@ -10,13 +12,12 @@ class Oauth
 {
 
 	protected $configuration;
+	protected $em;
 	
-	/**
-	 * @param array $configuration
-	 */
-	public function __construct( array $configuration = array() )
+	public function __construct( array $configuration = array(), EntityManager $em )
 	{
 		$this->configuration = $configuration;
+		$this->em            = $em;
 		
 	}
 
@@ -26,11 +27,25 @@ class Oauth
 
 	   	if (isset($this->configuration['granttype']) && $this->configuration['granttype'] == 'saml2-bearer') {
 	   	
-	   		return $this->getMachineToken();
+	   		$token =  $this->getMachineToken();
 	   
 	   	} else if (isset($this->configuration['granttype']) && $this->configuration['granttype'] == 'code')  {
 	        /* not implemented yet */
-	   		return $this->getCodeToken();	
+	   		$token = $this->getCodeToken();	
+	   	}
+	   	
+	   	$tokenValue = $this->em->getRepository('CiscoSystemsSparkBundle:Token')->findOneBy(array('clientId' => $this->configuration['client_id']));
+	   	if ($tokenValue)
+	   	{
+	   		$tokenValue->setSparkToken($token);
+	   		$tokenValue->setClientId($this->configuration['client_id']);
+	   		$this->em->persist($tokenValue);
+	   	} else {
+	   		$newToken = new SparkToken();
+	   		$newToken->setSparkToken($token);
+	   		$newToken->setClientId($this->configuration['client_id']);
+	   		$this->em->persist($newToken);
+	   		
 	   	}
 		
 	return $token;	

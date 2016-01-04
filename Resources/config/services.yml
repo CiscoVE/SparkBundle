@@ -6,3 +6,4 @@ services:
         class: '%cisco.spark.oauth.class%'
         arguments:
             - '%cisco.spark.config%'
+            - '@doctrine.orm.entity_manager'
