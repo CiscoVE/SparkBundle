@@ -1,1 +1,8 @@
+parameters:
+    cisco.spark.oauth.class:       CiscoSystems\SparkBundle\Authentication\Oauth
+    
 services:
+    cisco.spark.oauth:
+        class: '%cisco.spark.oauth.class%'
+        arguments:
+            - '%cisco.spark.config%'

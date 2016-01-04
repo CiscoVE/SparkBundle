@@ -13,14 +13,19 @@ class CiscoSystemsSparkExtension extends Extension
 {
     public function load( array $configs, ContainerBuilder $container )
     {
-        // Configuration
-        $configuration = new Configuration();
-        $processedConfig = $this->processConfiguration( $configuration, $configs );
-        
-        $container->setParameter( 'cisco_systems_spark.client_id', $processedConfig[ 'client_id' ]);
         
         // Services
         $loader = new YamlFileLoader( $container, new FileLocator( __DIR__ . '/../Resources/config' ));
         $loader->load( 'services.yml' );
+        
+        $config = array();
+        foreach ($configs as $subConfig) {
+        	$config = array_merge($config, $subConfig);
+        }
+        
+        $container->setParameter( 'cisco.spark.config', $config );
+        
     }
+    
+  
 }

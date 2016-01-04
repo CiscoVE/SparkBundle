@@ -7,15 +7,10 @@ use \GuzzleHttp\Psr7\Request;
 use Symfony\Component\DependencyInjection\Container;
 
 
-class Saml
+class Oauth
 {
 	
-private $container;
 
-public function __construct(Container $container) {
-	$this->container = $container;
-}
-	
 public function getNewToken() {
 		
 		$clientId = $this->container->getParameter('ciscospark.client_id');
