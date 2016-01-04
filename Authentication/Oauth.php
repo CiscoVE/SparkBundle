@@ -4,18 +4,26 @@ namespace CiscoSystems\SparkBundle\Authentication;
 use \GuzzleHttp\Client;
 use \GuzzleHttp\Exception\RequestException;
 use \GuzzleHttp\Psr7\Request;
-use Symfony\Component\DependencyInjection\Container;
+
 
 
 class Oauth
 {
+
+	protected $configuration;
 	
+	/**
+	 * @param array $configuration
+	 */
+	public function __construct( array $configuration = array() )
+	{
+		$this->configuration = $configuration;
+		
+	}
 
 public function getNewToken() {
 		
-		$clientId = $this->container->getParameter('ciscospark.client_id');
-		
-		echo $clientId;
+	   print_r($this->configuration);
 		
 		//$assetsManager = $kernel->getContainer()->get('acme_assets.assets_manager');
 	
