@@ -5,36 +5,28 @@ use \GuzzleHttp\Client;
 use \GuzzleHttp\Exception\RequestException;
 use \GuzzleHttp\Psr7\Request;
 use Doctrine\ORM\EntityManager;
+use CiscoSystems\SparkBundle\Authentication\Oauth;
 
 
 class Room  {
 	
 	CONST ROOMURI   = 'https://api.ciscospark.com/v1/rooms/';
 	
-	protected $clientId;
-	protected $em;
+	protected $oauth;
 	
-	public function __construct( $clientId, EntityManager $em )
+	public function __construct( Oauth $oauth )
 	{
-		$this->clientId = $clientId;
-		$this->em       = $em;
-	}
-	
-	public function getAccessToken()
-	{	
+		$this->oauth    = $oauth;
 		
 	}
-	
+
 	public function createRoom($title = "New Room")
 	{
 		$roomJson = '{"title":"'.$title.'"}';
 		
-		$this->accessToken = "1234";
-		$at = 'Bearer YjcxYzNjZjgtYjQ1Yi00YTU3LWJlY2ItOTQ1NmVkN2MxMzgzNDI1NmIzY2MtZWE1';
-
 		$client = new Client();
 		$baseRequest = new \GuzzleHttp\Psr7\Request("POST", self::ROOMURI, [
-    									'Authorization' => 'Bearer 1234',
+    									'Authorization' => $this->oauth->getStoredToken(),
     									'Content-Type'  => 'application/json',
 		], $roomJson );
 	
@@ -47,7 +39,7 @@ class Room  {
           	if ($statusCode == '401')
           	{
 	
-          	$request  = $baseRequest->withHeader('Authorization', $at);
+          	$request  = $baseRequest->withHeader('Authorization', $this->oauth->getNewToken());
           	$response = $client->send($request);
           	} 
 

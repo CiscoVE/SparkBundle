@@ -105,6 +105,19 @@ class Oauth
 		 return $machineToken; 
 	}
 	
+	public function getStoredToken()
+	{
+		$accessToken;
+		$tokenValue = $this->em->getRepository('CiscoSystemsSparkBundle:Token')
+							   ->find( $this->configuration['client_id'] );
+		if ($tokenValue)
+		{
+			$accessToken = $tokenValue->getSparkToken();
+		}
+		return $accessToken;
+
+	}
+	
 	
 	
 	
