@@ -1,6 +1,7 @@
 parameters:
     cisco.spark.oauth.class:       CiscoSystems\SparkBundle\Authentication\Oauth
     cisco.spark.room.class:        CiscoSystems\SparkBundle\Event\Room
+    cisco.spark.membership.class:  CiscoSystems\SparkBundle\Event\Membership
     
 services:
     cisco.spark.oauth:
@@ -10,6 +11,10 @@ services:
             - '@doctrine.orm.entity_manager'
     cisco.spark.room:
         class: '%cisco.spark.room.class%'
+        arguments:
+            - '@cisco.spark.oauth'
+    cisco.spark.membership:
+        class: '%cisco.spark.membership.class%'
         arguments:
             - '@cisco.spark.oauth'
    
