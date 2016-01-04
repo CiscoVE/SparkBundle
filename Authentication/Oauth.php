@@ -34,20 +34,21 @@ class Oauth
 	   		$token = $this->getCodeToken();	
 	   	}
 	   	
-	   	$tokenValue = $this->em->getRepository('CiscoSystemsSparkBundle:Token')->findOneBy(array('clientId' => $this->configuration['client_id']));
+	   	$tokenValue = $this->em->getRepository('CiscoSystemsSparkBundle:Token')->find( $this->configuration['client_id'] );
 	   	if ($tokenValue)
 	   	{
 	   		$tokenValue->setSparkToken($token);
 	   		$tokenValue->setClientId($this->configuration['client_id']);
 	   		$this->em->persist($tokenValue);
+	   		$this->em->flush($tokenValue);
 	   	} else {
 	   		$newToken = new SparkToken();
 	   		$newToken->setSparkToken($token);
 	   		$newToken->setClientId($this->configuration['client_id']);
 	   		$this->em->persist($newToken);
-	   		
+	   		$this->em->flush($newToken);	
 	   	}
-		
+	   	
 	return $token;	
 	}
 	

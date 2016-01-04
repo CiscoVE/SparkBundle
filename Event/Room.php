@@ -4,11 +4,28 @@ namespace CiscoSystems\SparkBundle\Event;
 use \GuzzleHttp\Client;
 use \GuzzleHttp\Exception\RequestException;
 use \GuzzleHttp\Psr7\Request;
+use Doctrine\ORM\EntityManager;
 
 
 class Room  {
 	
 	CONST ROOMURI   = 'https://api.ciscospark.com/v1/rooms/';
+	
+	protected $clientId;
+	protected $em;
+	
+	public function __construct( $clientId, EntityManager $em )
+	{
+		$this->clientId = $clientId;
+		$this->em       = $em;
+	}
+	
+	public function getAccessToken()
+	{
+	
+		
+		
+	}
 	
 	public function createRoom($title = "New Room")
 	{

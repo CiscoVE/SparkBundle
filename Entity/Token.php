@@ -15,7 +15,7 @@ class Token
 	/** @ORM\Column(name="token", type="string") */
 	protected $sparkToken;
 	
-	/** @ORM\Column(name="client_id", type="string") */
+	/** @ORM\Id @ORM\Column(name="client_id", type="string") */
 	protected $clientId;
 	
 	
