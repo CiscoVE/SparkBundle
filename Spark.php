@@ -4,7 +4,11 @@ namespace CiscoSystems\SparkBundle;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-
+use CiscoSystems\SparkBundle\Event\Room;
+use CiscoSystems\SparkBundle\Event\Membership;
+use CiscoSystems\SparkBundle\Event\Messages;
+use CiscoSystems\SparkBundle\Event\People;
+use CiscoSystems\SparkBundle\Event\WebHook;
 
 
 class Spark 
