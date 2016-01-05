@@ -2,6 +2,7 @@ parameters:
     cisco.spark.oauth.class:       CiscoSystems\SparkBundle\Authentication\Oauth
     cisco.spark.room.class:        CiscoSystems\SparkBundle\Event\Room
     cisco.spark.membership.class:  CiscoSystems\SparkBundle\Event\Membership
+    cisco.spark.messages.class:    CiscoSystems\SparkBundle\Event\Messages
     
 services:
     cisco.spark.oauth:
@@ -15,6 +16,10 @@ services:
             - '@cisco.spark.oauth'
     cisco.spark.membership:
         class: '%cisco.spark.membership.class%'
+        arguments:
+            - '@cisco.spark.oauth'
+    cisco.spark.message:
+        class: '%cisco.spark.messages.class%'
         arguments:
             - '@cisco.spark.oauth'
    

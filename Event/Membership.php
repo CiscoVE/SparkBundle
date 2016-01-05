@@ -56,15 +56,17 @@ class Membership  {
 	
 	public function createMembership($roomId = null, $personId = null, $personEmail = null, $isModerator = FALSE)
 	{
-		$queryParams    = array("roomId" => $roomId, "personId" => $personId, "personEmail" => $personEmail, "isModerator" => $isModerator );
-		$roomJson = '{"roomId": "'.$roomId.'"';
+		$requestParams    = array();
+		$requestParams["roomId"] 			= $roomId;
 	    	if ($personId != null){
-			$roomJson .= ',"personId": "'.$personId.'"';
+			$requestParams["personId"] 		= $personId;
 			}
 			if ($personEmail != null){
-			$roomJson .= ',"personEmail": "'.$personEmail.'"';
+			$requestParams["personEmail"] 	= $personEmail;
 			}
-		$roomJson .= ',"isModerator": '.$isModerator.' }';
+		$requestParams["isModerator"]       = $isModerator;
+		
+		$roomJson = json_encode($requestParams);
 		
 		$client  = new Client();
 		try{
@@ -89,8 +91,79 @@ class Membership  {
 		return json_decode($response->getBody());	
 	}
 	
+	public function getMembershipDetail($mid = '')
+	{
 
+			$client   = new Client(['base_uri' => self::MEMBERSHIPURI]);
+		
+			try{
+				$response = $client->request('GET', $mid, array(
+						'headers'       => $this->getBaseHeaders()
+				));
+			} catch (RequestException $e) {
+		
+				$statusCode = $e->getResponse()->getStatusCode();
+				if ($statusCode == '401')
+				{
+					$response = $client->request('get', $mid, array(
+							'headers' => $this->getRefreshHeaders()
+					));
+				}
+		
+			}
+			return json_decode($response->getBody());
+	}
+	
+	public function updateMembership($mid = '', $isModerator = '')
+	{
+		$roomJson = '';
+		if ('' != $isModerator)	{ $roomJson = '{"isModerator": '.$isModerator.' }'; }
+		
+		
+		$client   = new Client(['base_uri' => self::MEMBERSHIPURI]);
+		
+		try{
+			$response = $client->request('PUT', $mid, array(
+					'headers'   => $this->getBaseHeaders(),
+					'body'		=> $roomJson
+			));
+		} catch (RequestException $e) {
+		
+			$statusCode = $e->getResponse()->getStatusCode();
+			if ($statusCode == '401')
+			{
+				$response = $client->request('PUT', $mid, array(
+						'headers' => $this->getRefreshHeaders(),
+						'body'	  => $roomJson
+				));
+			}
+		
+		}
+		return json_decode($response->getBody());
+	}
 
-
+	public function deleteMembership( $mid = '' )
+	{
+		$client   = new Client(['base_uri' => self::MEMBERSHIPURI]);
+		
+		try{
+			$response = $client->request('DELETE', $mid, array(
+					'headers'   => $this->getBaseHeaders(),
+					'body'		=> $roomJson
+			));
+		} catch (RequestException $e) {
+		
+			$statusCode = $e->getResponse()->getStatusCode();
+			if ($statusCode == '401')
+			{
+				$response = $client->request('DELETE', $mid, array(
+						'headers' => $this->getRefreshHeaders(),
+						'body'	  => $roomJson
+				));
+			}
+		
+		}
+	return json_decode($response->getBody());
+	}
 
 }
