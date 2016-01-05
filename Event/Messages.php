@@ -75,13 +75,13 @@ class Messages  {
 		}
 		
 		
-		$roomJson = json_encode($requestArray);
+		$mJson = json_encode($requestArray);
 		
 		$client  = new Client();
 		try{
 			$response = $client->request("POST", self::MESSAGESURI, array(
 					'headers'       => $this->getBaseHeaders(),
-					'body'          => $roomJson
+					'body'          => $mJson
 			));
 		} catch (RequestException $e) {
 		
@@ -90,9 +90,9 @@ class Messages  {
 			if ($statusCode == '401')
 			{
 		
-				$response = $client->request("GET", self::MESSAGESURI, array(
+				$response = $client->request("POST", self::MESSAGESURI, array(
 						'headers'       => $this->getRefreshHeaders(),
-						'body'          => $roomJson
+						'body'          => $mJson
 				));
 			}
 		
@@ -100,7 +100,52 @@ class Messages  {
 		return json_decode($response->getBody());		
 	}
 	
+	public function getMessageDetails($mid = null)
+	{	
+		$client = new Client(['base_uri' => self::MESSAGESURI]);
 	
+		try{
+			$response = $client->request('GET', $mid, array(
+					'headers'       => $this->getBaseHeaders()
+			));
+		} catch (RequestException $e) {
+	
+			$statusCode = $e->getResponse()->getStatusCode();
+			if ($statusCode == '401')
+			{
+				$response = $client->request('GET', $mid, array(
+						'headers'       => $this->getRefreshHeaders()
+				));
+			}
+	
+		}	
+		return json_decode($response->getBody());
+	}
+	
+	public function deleteMessage($mid = null)
+	{
+	
+	
+		$client = new Client(['base_uri' => self::MESSAGESURI]);
+	
+		try{
+			$response = $client->request('DELETE', $mid, array(
+					'headers'       => $this->getBaseHeaders()
+			));
+		} catch (RequestException $e) {
+	
+			$statusCode = $e->getResponse()->getStatusCode();
+			if ($statusCode == '401')
+			{
+				$response = $client->request('DELETE', $mid, array(
+						'headers'       => $this->getRefreshHeaders()
+				));
+			}
+	
+		}
+	
+		return json_decode($response->getBody());
+	}
 	
 	
 	
