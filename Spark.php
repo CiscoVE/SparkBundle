@@ -6,7 +6,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use CiscoSystems\SparkBundle\Event\Room;
 use CiscoSystems\SparkBundle\Event\Membership;
-use CiscoSystems\SparkBundle\Event\Messages;
+use CiscoSystems\SparkBundle\Event\Message;
 use CiscoSystems\SparkBundle\Event\People;
 use CiscoSystems\SparkBundle\Event\WebHook;
 
@@ -16,16 +16,16 @@ class Spark
 
 	protected $room;
 	protected $membership;
-	protected $messages;
+	protected $message;
 	protected $people;
 	protected $webhook;
 	
 	
-	public function __construct( Room $room, Membership $membership, Messages $messages, People $people, WebHook $webhook )
+	public function __construct( Room $room, Membership $membership, Messages $message, People $people, WebHook $webhook )
 	{
 		$this->room    		= $room;
 		$this->membership   = $membership;
-		$this->messages     = $messages;
+		$this->message      = $messages;
 		$this->people       = $people;
 		$this->webhook      = $webhook;
 	

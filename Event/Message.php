@@ -5,7 +5,7 @@ use \GuzzleHttp\Client;
 use \GuzzleHttp\Exception\RequestException;
 use CiscoSystems\SparkBundle\Authentication\Oauth;
 
-class Messages  {
+class Message  {
 
 	CONST MESSAGESURI   = 'https://api.ciscospark.com/v1/messages/';
 

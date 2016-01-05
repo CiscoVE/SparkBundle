@@ -5,7 +5,7 @@ use \GuzzleHttp\Client;
 use \GuzzleHttp\Exception\RequestException;
 use CiscoSystems\SparkBundle\Authentication\Oauth;
 
-class WebHooks  {
+class WebHook  {
 
 	CONST WEBHOOKURI   = 'https://api.ciscospark.com/v1/webhooks/';
 

@@ -2,9 +2,9 @@ parameters:
     cisco.spark.oauth.class:       CiscoSystems\SparkBundle\Authentication\Oauth
     cisco.spark.room.class:        CiscoSystems\SparkBundle\Event\Room
     cisco.spark.membership.class:  CiscoSystems\SparkBundle\Event\Membership
-    cisco.spark.messages.class:    CiscoSystems\SparkBundle\Event\Messages
+    cisco.spark.message.class:     CiscoSystems\SparkBundle\Event\Message
     cisco.spark.people.class:      CiscoSystems\SparkBundle\Event\People
-    cisco.spark.webhooks.class:    CiscoSystems\SparkBundle\Event\WebHooks
+    cisco.spark.webhook.class:     CiscoSystems\SparkBundle\Event\WebHook
     cisco.spark.class:             CiscoSystems\SparkBundle\Spark
     
 services:
@@ -22,7 +22,7 @@ services:
         arguments:
             - '@cisco.spark.oauth'
     cisco.spark.message:
-        class: '%cisco.spark.messages.class%'
+        class: '%cisco.spark.message.class%'
         arguments:
             - '@cisco.spark.oauth'
     cisco.spark.people:
@@ -30,7 +30,7 @@ services:
         arguments:
             - '@cisco.spark.oauth'
     cisco.spark.webhook:
-        class: '%cisco.spark.webhooks.class%'
+        class: '%cisco.spark.webhook.class%'
         arguments:
             - '@cisco.spark.oauth'
     cisco.spark:
