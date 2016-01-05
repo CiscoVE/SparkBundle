@@ -27,9 +27,14 @@ class Message  {
 		return array('Authorization' => $this->oauth->getNewToken(),'content-type'  => 'application/json');
 	}
 	
-	public function getMessages($roomId = '', $before = '', $beforeMessage = '', $max = null)
+	/* options should be in key => value array.  Options are before,beforeMessage,max */
+	public function getMessages($roomId = '', $options = array() )
 	{
-		$queryParams    = array("roomId" => $rooomId, "before" => $before, "beforeMessage" => $beforeMessage, "max" => $max );
+		$queryParams = array();
+		$queryParams['roomId'] = $roomId;
+		if (isset($options['before'])){ $queryParams['before'] = $options['before']; }
+		if (isset($options['beforeMessage'])){ $queryParams['beforeMessage'] = $options['beforeMessage']; }
+		if (isset($options['max'])){ $queryParams['max'] = $options['max']; }
 		
 		$client  = new Client();
 		try{
