@@ -21,11 +21,11 @@ class Spark
 	protected $webhook;
 	
 	
-	public function __construct( Room $room, Membership $membership, Messages $message, People $people, WebHook $webhook )
+	public function __construct( Room $room, Membership $membership, Message $message, People $people, WebHook $webhook )
 	{
 		$this->room    		= $room;
 		$this->membership   = $membership;
-		$this->message      = $messages;
+		$this->message      = $message;
 		$this->people       = $people;
 		$this->webhook      = $webhook;
 	
