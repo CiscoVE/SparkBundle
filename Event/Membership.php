@@ -65,17 +65,16 @@ class Membership  {
 	{
 		$requestParams    = array();
 		$requestParams["roomId"] 			    = $roomId;
-	    	if ($options["personId"]){
+	    	if (isset($options["personId"])){
 				$requestParams["personId"] 		= $options["personId"];
 			}
-			if ($options["personEmail"]){
+			if (isset($options["personEmail"])){
 				$requestParams["personEmail"] 	= $options["personEmail"];
 			}
-			if ($options["isModerator"]){
+			if (isset($options["isModerator"])){
 				$requestParams["isModerator"]   = $options["isModerator"];
 			}
-		
-		
+
 		$mJson = json_encode($requestParams);
 		
 		$client  = new Client();
