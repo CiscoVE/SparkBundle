@@ -27,9 +27,16 @@ class Membership  {
 		return array('Authorization' => $this->oauth->getNewToken(),'content-type'  => 'application/json');
 	}
 	
-	public function getMemberships($roomId = null, $personId = null, $personEmail = null, $max = null)
+	/* options are roomId,personId,personEmail,max
+	 * and should be passed as a key => value array
+	 */  
+	public function getMemberships($options = array())
 	{
-		$queryParams    = array("roomId" => $roomId, "personId" => $personId, "personEmail" => $personEmail, "max" => $max );
+		$queryParams = array();
+		if (isset($options['roomId'])) { $queryParams['roomId'] = $options['roomId']; }
+		if (isset($options['personId'])) { $queryParams['personId'] = $options['personId']; }
+		if (isset($options['personEmail'])) { $queryParams['personEmail'] = $options['personEmail']; }
+		if (isset($options['max'])) { $queryParams['max'] = $options['max']; }
 		
 		$client  = new Client();
 		try{
@@ -57,7 +64,7 @@ class Membership  {
 	public function createMembership($roomId = '', $options = array())
 	{
 		$requestParams    = array();
-		$requestParams["roomId"] 			= $roomId;
+		$requestParams["roomId"] 			    = $roomId;
 	    	if ($options["personId"]){
 				$requestParams["personId"] 		= $options["personId"];
 			}

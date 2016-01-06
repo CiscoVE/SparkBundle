@@ -118,6 +118,18 @@ class Oauth
 
 	}
 	
+	public function getMachineId( ){
+			
+		$client   = new \GuzzleHttp\Client();
+		$response = $client->get('https://conv-a.wbx2.com/conversation/api/v1/users/directory?q='.$this->configuration['machine_id'].'&includeMyBots=true', [
+				'headers'         => ['Authorization'=> $this->getStoredToken(),'user-agent'=>'Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0']
+		]);
+	
+		$jsonArray = json_decode($response->getBody());
+		$userString = "ciscospark://us/PEOPLE/".$jsonArray[0]->id;
+		return base64_encode($userString);
+	}
+	
 	
 	
 	

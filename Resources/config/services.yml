@@ -41,4 +41,5 @@ services:
             - '@cisco.spark.message'
             - '@cisco.spark.people'
             - '@cisco.spark.webhook'
+            - '@cisco.spark.oauth'
    
