@@ -45,14 +45,14 @@ class Spark
 		
 		if ($room->id)
 		{
-			
-			
 			$memberOptions = array();
-		    $memberOption['personEmail']  = $defaultUserEmail;
+		    $memberOptions['personEmail'] = $defaultUserEmail;
 		    $memberOptions['isModerator'] = FALSE;
 
 			$addMember = $this->membership->createMembership($room->id, $memberOptions );
+			if (isset($addMember->id)){
 			$this->lockRoom($room->id);
+			}
 			
 		}
 		return $room->id;

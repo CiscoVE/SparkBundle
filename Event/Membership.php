@@ -63,7 +63,13 @@ class Membership  {
 		}
 		return json_decode($response->getBody());	
 	}
-	/*  Options are personId, PersonEmail, isModerator.  RoomId is Required */
+	
+	/*  
+	 * Paramters: String $roomId, Array $options
+	 * $roomId is Required.
+	 * Option array should be key => value pairs with keys: personId, PersonEmail, isModerator
+	 * return array();
+	 */
 	public function createMembership($roomId = '', $options = array())
 	{
 		$requestParams    = array();
