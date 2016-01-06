@@ -9,7 +9,7 @@ class ApiException extends Exception
 {
 
 	
-	public function errorMessage($code = null)
+	public static function errorMessage($code = null)
 	{
 		
 		switch ($code) {

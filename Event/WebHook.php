@@ -4,6 +4,7 @@ namespace CiscoSystems\SparkBundle\Event;
 use \GuzzleHttp\Client;
 use \GuzzleHttp\Exception\RequestException;
 use CiscoSystems\SparkBundle\Authentication\Oauth;
+use CiscoSystems\SparkBundle\Exception\ApiException;
 
 class WebHook  {
 
@@ -48,6 +49,8 @@ class WebHook  {
 						'headers'       => $this->getRefreshHeaders(),
 						'query'         => $queryParams
 				));
+			} else if ($statusCode != '200') {
+				return ApiException::errorMessage($statusCode);
 			}
 	
 		}
@@ -83,6 +86,8 @@ class WebHook  {
 						'headers'       => $this->getRefreshHeaders(),
 						'body'          => $whJson
 				));
+			} else if ($statusCode != '200') {
+				return ApiException::errorMessage($statusCode);
 			}
 		
 		}
@@ -107,6 +112,8 @@ class WebHook  {
 				$response = $client->request('GET', $wid, array(
 						'headers'       => $this->getRefreshHeaders()
 				));
+			} else if ($statusCode != '200') {
+				return ApiException::errorMessage($statusCode);
 			}
 	
 		}	
@@ -128,7 +135,7 @@ class WebHook  {
 					'headers'       => $this->getBaseHeaders(),
 					'body'          => $whJson
 			));
-		} catch (RequestException $e) {
+		} catch (RequestExceptionAP $e) {
 		
 			$statusCode = $e->getResponse()->getStatusCode();
 			if ($statusCode == '401')
@@ -137,6 +144,8 @@ class WebHook  {
 						'headers'       => $this->getRefreshHeaders(),
 						'body'          => $whJson
 				));
+			} else if ($statusCode != '200') {
+				return ApiException::errorMessage($statusCode);
 			}
 		
 		}

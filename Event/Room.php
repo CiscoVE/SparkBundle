@@ -5,6 +5,7 @@ use \GuzzleHttp\Client;
 use \GuzzleHttp\Exception\RequestException;
 use \GuzzleHttp\Psr7\Request;
 use CiscoSystems\SparkBundle\Authentication\Oauth;
+use CiscoSystems\SparkBundle\Exception\ApiException;
 
 
 class Room  {
@@ -46,7 +47,9 @@ class Room  {
 	
           	$request  = $baseRequest->withHeader('Authorization', $this->oauth->getNewToken());
           	$response = $client->send($request);
-          	} 
+          	} else if ($statusCode != '200') {
+				return ApiException::errorMessage($statusCode);
+			}
 
 		}
 		
@@ -73,6 +76,8 @@ class Room  {
 				'headers'       => $this->getRefreshHeaders(),
 				'query'         => $queryParams
 				));
+			} else if ($statusCode != '200') {
+				return ApiException::errorMessage($statusCode);
 			}
 	
 		}
@@ -99,6 +104,8 @@ class Room  {
 						'headers' => $this->getRefreshHeaders(),
 						'body'    => $roomJson
 				));
+			} else if ($statusCode != '200') {
+				return ApiException::errorMessage($statusCode);
 			}
 		
 		}
@@ -121,6 +128,8 @@ class Room  {
 				$response = $client->request('DELETE', $rid, array(
 						'headers' => $this->getRefreshHeaders()
 				));
+			} else if ($statusCode != '204') {
+				return ApiException::errorMessage($statusCode);
 			}
 	
 		}

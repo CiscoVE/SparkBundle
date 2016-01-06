@@ -4,6 +4,7 @@ namespace CiscoSystems\SparkBundle\Event;
 use \GuzzleHttp\Client;
 use \GuzzleHttp\Exception\RequestException;
 use CiscoSystems\SparkBundle\Authentication\Oauth;
+use CiscoSystems\SparkBundle\Exception\ApiException;
 
 class Message  {
 
@@ -53,6 +54,8 @@ class Message  {
 						'headers'       => $this->getRefreshHeaders(),
 						'query'         => $queryParams
 				));
+			} else if ($statusCode != '200') {
+				return ApiException::errorMessage($statusCode);
 			}
 		
 		}
@@ -99,6 +102,8 @@ class Message  {
 						'headers'       => $this->getRefreshHeaders(),
 						'body'          => $mJson
 				));
+			} else if ($statusCode != '200') {
+				return ApiException::errorMessage($statusCode);
 			}
 		
 		}
@@ -121,6 +126,8 @@ class Message  {
 				$response = $client->request('GET', $mid, array(
 						'headers'       => $this->getRefreshHeaders()
 				));
+			} else if ($statusCode != '200') {
+				return ApiException::errorMessage($statusCode);
 			}
 	
 		}	
@@ -145,6 +152,8 @@ class Message  {
 				$response = $client->request('DELETE', $mid, array(
 						'headers'       => $this->getRefreshHeaders()
 				));
+			} else if ($statusCode != '204') {
+				return ApiException::errorMessage($statusCode);
 			}
 	
 		}

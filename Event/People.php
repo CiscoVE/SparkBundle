@@ -4,6 +4,7 @@ namespace CiscoSystems\SparkBundle\Event;
 use \GuzzleHttp\Client;
 use \GuzzleHttp\Exception\RequestException;
 use CiscoSystems\SparkBundle\Authentication\Oauth;
+use CiscoSystems\SparkBundle\Exception\ApiException;
 
 class People  {
 
@@ -49,6 +50,8 @@ class People  {
 						'headers'       => $this->getRefreshHeaders(),
 						'query'         => $queryParams
 				));
+			} else if ($statusCode != '200') {
+				return ApiException::errorMessage($statusCode);
 			}
 		
 		}
@@ -72,6 +75,8 @@ class People  {
 				$response = $client->request('get', $pid, array(
 						'headers' => $this->getRefreshHeaders()
 				));
+			} else if ($statusCode != '200') {
+				return ApiException::errorMessage($statusCode);
 			}
 	
 		}
@@ -95,6 +100,8 @@ class People  {
 				$response = $client->request('get','me', array(
 						'headers' => $this->getRefreshHeaders()
 				));
+			} else if ($statusCode != '200') {
+				return ApiException::errorMessage($statusCode);
 			}
 	
 		}
