@@ -65,7 +65,7 @@ class Spark
 	    if ('' != $personEmail){
 	    	$membershipOptions['personEmail'] = $personEmail;
 	    } else {
-	    	$membershipOptions['personId']    = $this->oath->getMachineId( );
+	    	$membershipOptions['personId']    = $this->oauth->getMachineId( );
 	    }
 	    
 		$membershipArray = $this->membership->getMemberships($membershipOptions);
@@ -74,6 +74,5 @@ class Spark
 		$addMod          = $this->membership->updateMembership($membershipId, TRUE);
 	    return $addMod;
 		}
-
 
 }
