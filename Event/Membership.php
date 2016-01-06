@@ -4,6 +4,7 @@ namespace CiscoSystems\SparkBundle\Event;
 use \GuzzleHttp\Client;
 use \GuzzleHttp\Exception\RequestException;
 use CiscoSystems\SparkBundle\Authentication\Oauth;
+use CiscoSystems\SparkBundle\Exception\ApiException;
 
 class Membership  {
 
@@ -55,6 +56,8 @@ class Membership  {
 				'headers'       => $this->getRefreshHeaders(),
 				'query'         => $queryParams
 				));
+			} else if ($statusCode != '200') {
+				return ApiException::errorMessage($statusCode);
 			}
 	
 		}
@@ -76,10 +79,9 @@ class Membership  {
 			}
 
 		$mJson = json_encode($requestParams);
-		
 		$client  = new Client();
 		try{
-			$response = $client->request("POST", self::MEMBERSHIPURI, array(
+			$response = $client->post(self::MEMBERSHIPURI, array(
 					'headers'       => $this->getBaseHeaders(),
 					'body'          => $mJson
 			));
@@ -90,10 +92,12 @@ class Membership  {
 			if ($statusCode == '401')
 			{
 		
-				$response = $client->request("GET", self::MEMBERSHIPURI, array(
+				$response = $client->post(self::MEMBERSHIPURI, array(
 						'headers'       => $this->getRefreshHeaders(),
 						'body'          => $mJson
 				));
+			} else if ($statusCode != '200') {
+				return ApiException::errorMessage($statusCode);
 			}
 		
 		}
@@ -117,6 +121,8 @@ class Membership  {
 					$response = $client->request('get', $mid, array(
 							'headers' => $this->getRefreshHeaders()
 					));
+				} else if ($statusCode != '200') {
+					return ApiException::errorMessage($statusCode);
 				}
 		
 			}
@@ -145,6 +151,8 @@ class Membership  {
 						'headers' => $this->getRefreshHeaders(),
 						'body'	  => $mJson
 				));
+			} else if ($statusCode != '200') {
+				return ApiException::errorMessage($statusCode);
 			}
 		
 		}
@@ -167,6 +175,8 @@ class Membership  {
 				$response = $client->request('DELETE', $mid, array(
 						'headers' => $this->getRefreshHeaders()
 				));
+			} else if ($statusCode != '204') {
+				return ApiException::errorMessage($statusCode);
 			}
 		
 		}
