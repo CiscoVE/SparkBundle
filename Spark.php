@@ -45,14 +45,15 @@ class Spark
 		
 		if ($room->id)
 		{
-			$this->lockRoom($room->id);
+			
 			
 			$memberOptions = array();
 		    $memberOption['personEmail']  = $defaultUserEmail;
 		    $memberOptions['isModerator'] = FALSE;
 
-			$this->membership->createMembership($room->id, $memberOptions );
-
+			$addMember = $this->membership->createMembership($room->id, $memberOptions );
+			$this->lockRoom($room->id);
+			
 		}
 		return $room->id;
 	}
@@ -65,11 +66,11 @@ class Spark
 	    if ('' != $personEmail){
 	    	$membershipOptions['personEmail'] = $personEmail;
 	    } else {
-	    	$membershipOptions['personId']    = $this->oauth->getMachineId( );
+	    	$membershipOptions['personId']    = $this->oauth->getMachineId();
 	    }
 	    
 		$membershipArray = $this->membership->getMemberships($membershipOptions);
-		$membershipId    = $membershipArray->items->id;
+		$membershipId    = $membershipArray->items[0]->id;
 		
 		$addMod          = $this->membership->updateMembership($membershipId, TRUE);
 	    return $addMod;
