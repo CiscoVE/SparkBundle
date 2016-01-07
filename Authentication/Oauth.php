@@ -14,16 +14,11 @@ class Oauth
 
 	protected $configuration;
 	protected $em;
-	protected $twig;
-
 	
 	public function __construct( array $configuration = array(), EntityManager $em )
 	{
 		$this->configuration = $configuration;
 		$this->em            = $em;
-		$this->twig          = $twig;
-
-		
 	}
 
 	public function getNewToken() 
