@@ -5,6 +5,7 @@ use \GuzzleHttp\Client;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Doctrine\ORM\EntityManager;
 use CiscoSystems\SparkBundle\Entity\Token as SparkToken;
+use CiscoSystems\SparkBundle\Authentication\HttpPost;
 
 
 
@@ -13,11 +14,15 @@ class Oauth
 
 	protected $configuration;
 	protected $em;
+	protected $twig;
+
 	
 	public function __construct( array $configuration = array(), EntityManager $em )
 	{
 		$this->configuration = $configuration;
 		$this->em            = $em;
+		$this->twig          = $twig;
+
 		
 	}
 
@@ -57,6 +62,8 @@ class Oauth
 		$authlink; $genericJsonBody; $genericToken;
 		
 		$tokenURI        = 'https://idbroker.webex.com/idb/oauth2/v1/access_token';
+		
+		
 		
 		/* Check if config parameters are set, before generating links and body */
 		if (isset($this->configuration['machine_org']))
@@ -105,9 +112,55 @@ class Oauth
 		 return $machineToken; 
 	}
 	
+	public function getCodeToken()
+	{
+		if (isset($this->configuration['client_id']) && isset($this->configuration['client_secret']))
+		{
+			$genericToken = 'Basic ' . base64_encode($this->configuration['client_id'].':'.$this->configuration['client_secret']);
+		} else {
+			throw new InvalidConfigurationException( "Either the 'client_id' and/or the 'client_secret' parameters are not configured in your config.yml file." );
+		}
+		$redirect_uri = 'http://developer.cisco.local/spark/test';
+		if (!isset($_GET['code']))
+		{
+			$extraParameters = array('scope' => 'spark:rooms_read spark:rooms_write spark:memberships_read spark:memberships_write spark:messages_read spark:messages_write spark:people_read', 'state' => 'oauth_code_state_id');
+		    $codeUrl = $this->getAuthenticationUrl('https://api.ciscospark.com/v1/authorize', $redirect_uri , $extraParameters );
+		
+			header('Location: ' . $codeUrl);
+			die('Redirect');
+		} else {
+			$url    = 'https://api.ciscospark.com/v1/access_token';
+			$params = array(
+					"code" => $_GET['code'],
+					"client_id" => $this->configuration['client_id'],
+					"client_secret" => $this->configuration['client_secret'],
+					"redirect_uri" => $redirect_uri,
+					"grant_type" => "authorization_code"
+			);
+			$request = new HttpPost($url);
+			$request->setPostData($params);
+			$request->send();
+			
+			// decode the incoming string as JSON
+			$authresponse = json_decode($request->getHttpResponse());
+			
+			if (isset($authresponse->access_token))
+			{
+				return "Bearer " . $authresponse->access_token;
+			} else {
+				return "";
+			}
+			
+			
+		}
+		
+		
+		
+	}
+	
 	public function getStoredToken()
 	{
-		$accessToken;
+		$accessToken = '';
 		$tokenValue = $this->em->getRepository('CiscoSystemsSparkBundle:Token')
 							   ->find( $this->configuration['client_id'] );
 		if ($tokenValue)
@@ -116,6 +169,24 @@ class Oauth
 		}
 		return $accessToken;
 
+	}
+	
+	/**
+	 * getAuthenticationUrl
+	 *
+	 * @param string $auth_endpoint Url of the authentication endpoint
+	 * @param string $redirect_uri  Redirection URI
+	 * @param array  $extra_parameters  Array of extra parameters like scope or state (Ex: array('scope' => null, 'state' => ''))
+	 * @return string URL used for authentication
+	 */
+	public function getAuthenticationUrl($auth_endpoint, $redirect_uri, array $extra_parameters = array())
+	{
+		$parameters = array_merge(array(
+				'response_type' => 'code',
+				'client_id'     => $this->configuration['client_id'],
+				'redirect_uri'  => $redirect_uri
+		), $extra_parameters);
+		return $auth_endpoint . '?' . http_build_query($parameters, null, '&');
 	}
 	
 	public function getMachineId( ){
