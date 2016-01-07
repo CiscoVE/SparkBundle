@@ -31,7 +31,7 @@ class Membership  {
 	/* options are roomId,personId,personEmail,max
 	 * and should be passed as a key => value array
 	 */  
-	public function getMemberships($options = array())
+	public function getMembership($options = array())
 	{
 		$queryParams = array();
 		if (isset($options['roomId'])) { $queryParams['roomId'] = $options['roomId']; }

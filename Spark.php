@@ -136,5 +136,32 @@ class Spark
 	
 		return $renameRoom;
 	}
+	
+	public function addSingleSparkUser( $sparkId, $newUserEmail){
+	
+		$options = array();
+		$options['personEmail'] = $newUserEmail;
+		
+		$addMember = $this->membership->createMembership( $sparkId, $options);
+		return $addMember;
+	
+	}
+	
+	public function removeSparkUser( $sparkId, $pid){
+	
+		$memberOptions = array();
+		$memberOptions['roomId'] 	= $sparkId;
+		$memberOptions['personId']	= $pid;
+		$removeUser = array();
+		$mid = $this->membership->getMembership($membershipOptions);
+		if (isset($mid->items) && count($mid->items) > 0)
+		{
+			$removeUser = $this->membership->deleteMembership($mid->items->id);
+			
+		}
+
+		return $removeUser;
+	
+	}
 
 }
