@@ -130,5 +130,11 @@ class Spark
 			return $getMessages;
 		}
 	}
+	
+	public function renameRoom($sparkId = null, $roomName = null){
+		$renameRoom = $this->room->updateRoom( $sparkId, $roomName );
+	
+		return $renameRoom;
+	}
 
 }
