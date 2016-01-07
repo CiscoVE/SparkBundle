@@ -137,31 +137,67 @@ class Spark
 		return $renameRoom;
 	}
 	
-	public function addSingleSparkUser( $sparkId, $newUserEmail){
-	
-		$options = array();
-		$options['personEmail'] = $newUserEmail;
-		
-		$addMember = $this->membership->createMembership( $sparkId, $options);
+	/* Description: Adds a single user to a given Spark Room.
+	 * @Param String $sparkId - The spark room base64 id
+	 * @Param Array  $newUserOptions - Options array are: array('personId' => '', 'personEmail' => '', 'isModerator' => FALSE/TRUE)
+	 * @Return Array - Contains the personId, email, roomid, createdDate
+	 */
+	public function addSingleSparkUser( $sparkId, $newUserOptions = array()){
+
+		$addMember = $this->membership->createMembership( $sparkId, $newUserOptions);
 		return $addMember;
 	
 	}
 	
-	public function removeSparkUser( $sparkId, $pid){
+	/* Description: removes a single user to a given Spark Room.
+	 * @Param String $sparkId - The room Id containing the user to be removed
+	 * @Param Array  $removeUserOptions - Options array are: array('personId' => '', 'personEmail' => ''). 
+	 * Add only one of the two keys to reference the user.
+	 * @Return Array 
+	 */
+	public function removeSparkUser( $sparkId, $removeUserOptions = array() ){
 	
 		$memberOptions = array();
 		$memberOptions['roomId'] 	= $sparkId;
-		$memberOptions['personId']	= $pid;
+		if (isset($removeUserOptions['personId'])){
+			$memberOptions['personId'] = $removeUserOptions['personId'];
+		}
+		if (isset($removeUserOptions['personEmail'])){
+			$memberOptions['personEmail'] = $removeUserOptions['personEmail'];
+		}
+
 		$removeUser = array();
-		$mid = $this->membership->getMembership($membershipOptions);
+		$mid = $this->membership->getMembership($memberOptions);
 		if (isset($mid->items) && count($mid->items) > 0)
 		{
 			$removeUser = $this->membership->deleteMembership($mid->items->id);
 			
 		}
-
 		return $removeUser;
+	}
 	
+	public function getParticipants($sparkId){
+        
+		$options = array();
+		$options['roomId'] = $sparkId;
+		
+		$p = $this->membership->getMembership($options);
+		$output = array();
+		if (isset($p->items) && count($p->items) > 0){
+			foreach ($p->items as $item){				
+					$convo = array();
+					$convo['id'] 			= $item->id;
+					$convo['personId'] 		= $item->personId;
+					$convo['personEmail'] 	= $item->personEmail;
+					$convo['roomId']		= $item->roomId;
+					$convo['isModerator']   = $item->isModerator;
+					$convo['created']       = $item->created;
+					$output[] = $convo;
+			}
+				
+		} 
+		
+		return $output;
 	}
 
 }
