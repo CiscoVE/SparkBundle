@@ -176,19 +176,26 @@ class Spark
 		return $removeUser;
 	}
 	
-	public function getParticipants($sparkId){
+	public function getParticipants($sparkId, $includeDisplayName = FALSE){
         
 		$options = array();
 		$options['roomId'] = $sparkId;
 		
-		$p = $this->membership->getMembership($options);
+		$m = $this->membership->getMembership($options);
+		
 		$output = array();
-		if (isset($p->items) && count($p->items) > 0){
-			foreach ($p->items as $item){				
+		if (isset($m->items) && count($m->items) > 0){
+			foreach ($m->items as $item){
+				    
 					$convo = array();
 					$convo['id'] 			= $item->id;
 					$convo['personId'] 		= $item->personId;
 					$convo['personEmail'] 	= $item->personEmail;
+					if ($includeDisplayName == TRUE)
+					{
+					$displayArray           = $this->people->getPersonDetail($item->personId);
+					$convo['displayName']   = $displayArray->displayName;
+					}
 					$convo['roomId']		= $item->roomId;
 					$convo['isModerator']   = $item->isModerator;
 					$convo['created']       = $item->created;
