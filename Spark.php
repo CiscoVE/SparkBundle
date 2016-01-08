@@ -176,7 +176,7 @@ class Spark
 		return $removeUser;
 	}
 	
-	public function getParticipants($sparkId, $includeDisplayName = FALSE){
+	public function getParticipants($sparkId){
         
 		$options = array();
 		$options['roomId'] = $sparkId;
@@ -190,12 +190,7 @@ class Spark
 					$convo = array();
 					$convo['id'] 			= $item->id;
 					$convo['personId'] 		= $item->personId;
-					$convo['personEmail'] 	= $item->personEmail;
-					if ($includeDisplayName == TRUE)
-					{
-					$displayArray           = $this->people->getPersonDetail($item->personId);
-					$convo['displayName']   = $displayArray->displayName;
-					}
+					$convo['personEmail'] 	= $item->personEmail;					
 					$convo['roomId']		= $item->roomId;
 					$convo['isModerator']   = $item->isModerator;
 					$convo['created']       = $item->created;
@@ -210,6 +205,12 @@ class Spark
 	public function getMachineUserId()
 	{
 		return $this->oauth->getMachineId();
+	}
+	
+	public function getDisplayName($pid)
+	{
+		$p = $this->person->getPersonDetail($pid);
+		return $p->displayName;
 	}
 
 }
