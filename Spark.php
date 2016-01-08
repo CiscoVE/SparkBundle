@@ -199,5 +199,10 @@ class Spark
 		
 		return $output;
 	}
+	
+	public function getMachineUserId()
+	{
+		return $this->oauth->getMachineId();
+	}
 
 }
