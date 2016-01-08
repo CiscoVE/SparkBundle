@@ -78,7 +78,7 @@ class Spark
 	    	$membershipOptions['personId']    = $this->oauth->getMachineId();
 	    }
 	    
-		$membershipArray = $this->membership->getMemberships($membershipOptions);
+		$membershipArray = $this->membership->getMembership($membershipOptions);
 		$membershipId    = $membershipArray->items[0]->id;
 		
 	    return $this->membership->updateMembership($membershipId, TRUE);
@@ -97,7 +97,7 @@ class Spark
 			$membershipOptions['personId']    = $this->oauth->getMachineId();
 		}
 		 
-		$membershipArray = $this->membership->getMemberships($membershipOptions);
+		$membershipArray = $this->membership->getMembership($membershipOptions);
 		$membershipId    = $membershipArray->items[0]->id;
 	
 		return $this->membership->updateMembership($membershipId, FALSE);
