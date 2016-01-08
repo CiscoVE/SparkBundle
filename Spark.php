@@ -143,9 +143,8 @@ class Spark
 	 * @Return Array - Contains the personId, email, roomid, createdDate
 	 */
 	public function addSingleSparkUser( $sparkId, $newUserOptions = array()){
-
-		$addMember = $this->membership->createMembership( $sparkId, $newUserOptions);
-		return $addMember;
+		
+		return $this->membership->createMembership( $sparkId, $newUserOptions);
 	
 	}
 	
@@ -167,11 +166,10 @@ class Spark
 		}
 
 		$removeUser = array();
-		$mid = $this->membership->getMembership($memberOptions);
-		if (isset($mid->items) && count($mid->items) > 0)
+		$mid = $this->membership->getMembership($memberOptions);		
+		if (isset($mid->items[0]->id) )
 		{
-			$removeUser = $this->membership->deleteMembership($mid->items->id);
-			
+			$removeUser = $this->membership->deleteMembership($mid->items[0]->id);			
 		}
 		return $removeUser;
 	}
@@ -183,23 +181,12 @@ class Spark
 		
 		$m = $this->membership->getMembership($options);
 		
-		$output = array();
+		
 		if (isset($m->items) && count($m->items) > 0){
-			foreach ($m->items as $item){
-				    
-					$convo = array();
-					$convo['id'] 			= $item->id;
-					$convo['personId'] 		= $item->personId;
-					$convo['personEmail'] 	= $item->personEmail;					
-					$convo['roomId']		= $item->roomId;
-					$convo['isModerator']   = $item->isModerator;
-					$convo['created']       = $item->created;
-					$output[] = $convo;
-			}
-				
+			return $m->items;				
 		} 
 		
-		return $output;
+		return $m;
 	}
 	
 	public function getMachineUserId()
@@ -209,8 +196,8 @@ class Spark
 	
 	public function getDisplayName($pid)
 	{
-		$p = $this->person->getPersonDetail($pid);
-		return $p->displayName;
+		$p = $this->people->getPersonDetail($pid);
+		return json_encode($p->displayName);
 	}
 
 }
