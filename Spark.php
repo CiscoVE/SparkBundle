@@ -80,8 +80,8 @@ class Spark
 	    
 		$membershipArray = $this->membership->getMembership($membershipOptions);
 		$membershipId    = $membershipArray->items[0]->id;
-		
-	    return $this->membership->updateMembership($membershipId, TRUE);
+		$lockResponse    = $this->membership->updateMembership($membershipId, TRUE);
+	    return $lockResponse;
 	}
 	
 	/* This function removes a person as moderator by email address.  If email is empty
@@ -99,8 +99,8 @@ class Spark
 		 
 		$membershipArray = $this->membership->getMembership($membershipOptions);
 		$membershipId    = $membershipArray->items[0]->id;
-	
-		return $this->membership->updateMembership($membershipId, FALSE);
+		$lockResponse    = $this->membership->updateMembership($membershipId, FALSE);        
+		return $lockResponse;
 	}
 	
 	/* Description: gets the conversation stream for a given room, where the text key has a value.  If text is empty,

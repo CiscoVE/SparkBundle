@@ -138,9 +138,8 @@ class Membership  {
 	public function updateMembership($mid = '', $isModerator = '')
 	{
 		$mJsonArray = array();
-		if ('' != $isModerator)	{ $mJsonArray['isModerator'] = $isModerator; }
+		if ('' !== $isModerator)	{ $mJsonArray['isModerator'] = $isModerator; }
 		$mJson = json_encode($mJsonArray);
-		
 		$client   = new Client(['base_uri' => self::MEMBERSHIPURI]);
 		
 		try{
