@@ -115,7 +115,10 @@ class Oauth
 		} else {
 			throw new InvalidConfigurationException( "Either the 'client_id' and/or the 'client_secret' parameters are not configured in your config.yml file." );
 		}
-		$redirect_uri = 'http://developer.cisco.local/spark/test';
+		if (!isset($this->configuration['redirect_url']))
+		{
+			throw new InvalidConfigurationException( "You must set a redirect url in your config.yml file." );
+		}
 		if (!isset($_GET['code']))
 		{
 			$extraParameters = array('scope' => 'spark:rooms_read spark:rooms_write spark:memberships_read spark:memberships_write spark:messages_read spark:messages_write spark:people_read', 'state' => 'oauth_code_state_id');
@@ -129,7 +132,7 @@ class Oauth
 					"code" => $_GET['code'],
 					"client_id" => $this->configuration['client_id'],
 					"client_secret" => $this->configuration['client_secret'],
-					"redirect_uri" => $redirect_uri,
+					"redirect_uri" => $this->configuration['redirect_url'],
 					"grant_type" => "authorization_code"
 			);
 			$request = new HttpPost($url);

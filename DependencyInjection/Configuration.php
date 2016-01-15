@@ -14,11 +14,12 @@ class Configuration implements ConfigurationInterface
     	
     	$node->children()
     	     ->scalarNode( 'granttype' )->isRequired()->cannotBeEmpty()->end()
-    		 ->scalarNode( 'machine_id' )->isRequired()->cannotBeEmpty()->end()
-    	     ->scalarNode( 'machine_secret' )->isRequired()->cannotBeEmpty()->end()
+    		 ->scalarNode( 'machine_id' )->end()
+    	     ->scalarNode( 'machine_secret' )->end()
     	     ->scalarNode( 'machine_org' )->end()
     	     ->scalarNode( 'client_id' )->isRequired()->cannotBeEmpty()->end()
-    	     ->scalarNode( 'client_secret' )->isRequired()->cannotBeEmpty()->end();
+    	     ->scalarNode( 'client_secret' )->isRequired()->cannotBeEmpty()->end()
+    	     ->scalarNode( 'redirect_url' )->end();
     	
     	return $treeBuilder;
     }
