@@ -14,11 +14,26 @@ class Oauth
 
 	protected $configuration;
 	protected $em;
+	protected $authEndpoint;
+	protected $redirectUri;
+	protected $consumerAuth;
 	
 	public function __construct( array $configuration = array(), EntityManager $em )
 	{
 		$this->configuration = $configuration;
 		$this->em            = $em;
+		$this->authEndpoint  = "https://api.ciscospark.com/v1/authorize";
+		$this->tokenEndpoint = "https://api.ciscospark.com/v1/access_token";
+		$this->redirectUri   = (isset($this->configuration['redirect_url'])) ? $this->configuration['redirect_url'] : null;
+		$this->consumerAuth  = 'https://idbroker.webex.com/idb/oauth2/v1/authorize';
+		if (isset($this->configuration['scope']))
+		{
+			$this->scope = $this->configuration['scope'];
+		}
+		else
+		{
+			$this->scope = 'spark:rooms_read spark:rooms_write spark:memberships_read spark:memberships_write spark:messages_read spark:messages_write spark:people_read';
+		}
 	}
 
 	public function getNewToken() 
@@ -30,8 +45,13 @@ class Oauth
 	   		$token =  $this->getMachineToken();
 	   
 	   	} else if (isset($this->configuration['granttype']) && $this->configuration['granttype'] == 'code')  {
-	        /* not implemented yet */
+
 	   		$token = $this->getCodeToken();	
+	   		
+	   	} else if (isset($this->configuration['granttype']) && $this->configuration['granttype'] == 'consumer')  {
+	   		
+	   		$token = $this->getConsumerToken($cid,$csc);
+	   		
 	   	}
 	   	
 	   	$tokenValue = $this->em->getRepository('CiscoSystemsSparkBundle:Token')->find( $this->configuration['client_id'] );
@@ -55,11 +75,7 @@ class Oauth
 	public function getMachineToken()
 	{
 		$authlink; $genericJsonBody; $genericToken;
-		
-		$tokenURI        = 'https://idbroker.webex.com/idb/oauth2/v1/access_token';
-		
-		
-		
+
 		/* Check if config parameters are set, before generating links and body */
 		if (isset($this->configuration['machine_org']))
 		{
@@ -96,9 +112,9 @@ class Oauth
 		
 		/* This  is the second part and will use the bearer token to issue an access token. */ 
 		$client = new \GuzzleHttp\Client();
-		$c2     = $client->post($tokenURI, [
+		$c2     = $client->post($this->tokenEndpoint, [
 		 'headers'         => ['Authorization'=>$genericToken,'Content-Type'=>'application/x-www-form-urlencoded','user-agent'=>'Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0'],
-		 'body'            => "grant_type=urn:ietf:params:oauth:grant-type:saml2-bearer&assertion=".$bearerToken."&scope=spark:rooms_read spark:rooms_write spark:memberships_read spark:memberships_write spark:messages_read spark:messages_write spark:people_read",
+		 'body'            => "grant_type=urn:ietf:params:oauth:grant-type:saml2-bearer&assertion=".$bearerToken."&scope=".$this->scope,
 		 ]);
 		
 		 $authresponse = json_decode($c2->getBody());
@@ -122,7 +138,7 @@ class Oauth
 		if (!isset($_GET['code']))
 		{
 			$extraParameters = array('scope' => 'spark:rooms_read spark:rooms_write spark:memberships_read spark:memberships_write spark:messages_read spark:messages_write spark:people_read', 'state' => 'oauth_code_state_id');
-		    $codeUrl = $this->getAuthenticationUrl('https://api.ciscospark.com/v1/authorize', $redirect_uri , $extraParameters );
+		    $codeUrl = $this->getAuthenticationUrl('https://api.ciscospark.com/v1/authorize', $extraParameters );
 		
 			header('Location: ' . $codeUrl);
 			die('Redirect');
@@ -151,23 +167,69 @@ class Oauth
 			
 			
 		}
-		
-		
-		
 	}
 	
-	public function getStoredToken()
+	public function getConsumerToken($username, $password)
 	{
-		$accessToken = '';
-		$tokenValue = $this->em->getRepository('CiscoSystemsSparkBundle:Token')
-							   ->find( $this->configuration['client_id'] );
-		if ($tokenValue)
+
+		$gotoUrlString  = trim($this->getAuthenticationUrl($this->consumerAuth, array('scope' => $this->scope)));
+        $gotoUrl        = base64_encode($gotoUrlString);   
+        $sunQueryString = $this->getSunQuery($username);
+        $sunQuery       = mb_convert_encoding($sunQueryString, "BASE64", "UTF-8");
+		$params = array('IDToken0' => '', 'IDToken1' => $username,'IDToken2' => $password,'IDButton' =>'Sign+In',
+					    'goto' => $gotoUrl,'SunQueryParamsString' => $sunQuery,	'encoded' =>'true', 
+				        'loginid' =>$username, 'isAudioCaptcha' =>'false', 'gx_charset' => 'UTF-8',
+				        'rememberEmail' => 'rememberEmail'
+		);
+
+		$c  = new \GuzzleHttp\Client(['cookies' => true]);
+		$r = $c->get('https://idbroker.webex.com/idb/UI/Login', [
+				'headers'         => ['Content-Type' => 'application/x-www-form-urlencoded'],
+				'query'           => $params,
+				'allow_redirects' => true,
+				'timeout'         => 5
+		]);
+
+		if ($r->getStatusCode() == '200')
 		{
-			$accessToken = $tokenValue->getSparkToken();
+		  if (null !== $this->parseSecurityCode($r->getBody()))
+		  {
+		  	
+		  	$secCode = $this->parseSecurityCode($r->getBody());
+		  	$sc      = new \GuzzleHttp\Client();
+		  	
+		  	$codeParams  = json_encode(array(
+		  			"security_code" => $secCode,
+		  			"client_id"     => 'C4d52e9ec25202b39f454f9128a005a2dfd6476e6ee51a9e92b4d25ba01de3f1b',
+		  			"response_type" => 'code',
+		  			"decision"      => 'accept'		  		
+		  	));
+		  	
+	        $codeQuery = array(
+	        		"response_type" => 'code',
+	        		"client_id"     => 'C4d52e9ec25202b39f454f9128a005a2dfd6476e6ee51a9e92b4d25ba01de3f1b',
+	        		"redirect_uri"  => $this->configuration['redirect_url'],
+	        		"scope"         => $this->scope
+	        );
+	        $codeUrl = 'https://idbroker.webex.com/idb/oauth2/v1/authorize?response_type=code&redirect_uri='.$this->configuration['redirect_url'].'&scope='.$this->scope.'&client_id=C4d52e9ec25202b39f454f9128a005a2dfd6476e6ee51a9e92b4d25ba01de3f1b';
+		  	$s = $sc->request('POST', $codeUrl, [	  			  		
+		  			'allow_redirects' => true,
+		  			'timeout'         => 5
+		  	], $codeParams);
+		  	
+		  	if ($s->getStatusCode() ==  '302' ) {
+            echo $s->getStatusCode();
+		  	echo $s->getBody();
+		  	} else if ( $s->getStatusCode() ==  '200' ) {
+		  		echo $s->getBody();
+		  	}
+		  }
 		}
-		return $accessToken;
+	
 
 	}
+	
+	/* Helper functions to Generate Access tokens for API Usage */
 	
 	/**
 	 * getAuthenticationUrl
@@ -177,15 +239,33 @@ class Oauth
 	 * @param array  $extra_parameters  Array of extra parameters like scope or state (Ex: array('scope' => null, 'state' => ''))
 	 * @return string URL used for authentication
 	 */
-	public function getAuthenticationUrl($auth_endpoint, $redirect_uri, array $extra_parameters = array())
+	public function getAuthenticationUrl( $auth_endpoint, array $extra_parameters = array())
 	{
 		$parameters = array_merge(array(
 				'response_type' => 'code',
-				'client_id'     => $this->configuration['client_id'],
-				'redirect_uri'  => $redirect_uri
+				'client_id'     => 'C4d52e9ec25202b39f454f9128a005a2dfd6476e6ee51a9e92b4d25ba01de3f1b', /*$this->configuration['client_id'],*/
+				'redirect_uri'  => $this->redirectUri
 		), $extra_parameters);
-		return $auth_endpoint . '?' . http_build_query($parameters, null, '&');
+		$qs = $auth_endpoint . '?' . http_build_query($parameters, null, '&');
+		return $qs;
 	}
+	
+	public function getSunQuery($login)
+	{
+		$query = 'isCookie=false&fromGlobal=yes&gx_charset=UTF-8&realm=consumer&type=login&msgId_0=identity.login.squareduser.message&email='.$login;
+		return  $query;
+	}
+    
+	public function parseSecurityCode($html) {
+		if (preg_match('/<input type="hidden" value="(\w+)" name="security_code/', $html , $matches)) {
+    		return $matches[1];
+		}
+		
+		if (preg_match('/<input type="hidden" name="security_code" value="(\w+)"/', $html , $matches)) {
+			return $matches[1];
+		}
+	}
+	
 	
 	public function getMachineId( ){
 			
@@ -197,6 +277,19 @@ class Oauth
 		$jsonArray = json_decode($response->getBody());
 		$userString = "ciscospark://us/PEOPLE/".$jsonArray[0]->id;
 		return base64_encode($userString);
+	}
+	
+	public function getStoredToken()
+	{
+		$accessToken = '';
+		$tokenValue = $this->em->getRepository('CiscoSystemsSparkBundle:Token')
+		->find( $this->configuration['client_id'] );
+		if ($tokenValue)
+		{
+			$accessToken = $tokenValue->getSparkToken();
+		}
+		return $accessToken;
+	
 	}
 	
 	
