@@ -107,5 +107,27 @@ class People  {
 		}
 		return json_decode($response->getBody());
 	}
+	
+	public function getMachinePersonId($user = NULL){
+		 
+		$client   = new \GuzzleHttp\Client();
+	
+		try{
+			$response = $client->get('https://conv-a.wbx2.com/conversation/api/v1/users/directory?q='.$user.'&includeMyBots=true', [
+				'headers'  => $this->getBaseHeaders() ]);
+		} catch (RequestException $e) {
+		
+			$statusCode = $e->getResponse()->getStatusCode();
+			if ($statusCode == '401')
+			{
+				$response = $client->get('https://conv-a.wbx2.com/conversation/api/v1/users/directory?q='.$user.'&includeMyBots=true', [
+						'headers'  => $this->getRefreshHeaders() ]);
+				
+			} else if ($statusCode != '200') {
+				return ApiException::errorMessage($statusCode);
+			}
+		}
+		return json_decode($response->getBody());
+	}
 
 }
