@@ -4,6 +4,7 @@ namespace CiscoSystems\SparkBundle\Authentication;
 use \GuzzleHttp\Client;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Doctrine\ORM\EntityManager;
+use CiscoSystems\SparkBundle\Event\People;
 use CiscoSystems\SparkBundle\Entity\Token as SparkToken;
 use CiscoSystems\SparkBundle\Authentication\HttpPost;
 
@@ -13,15 +14,17 @@ class Oauth
 {
 
 	protected $configuration;
+	protected $people;
 	protected $em;
 	protected $authEndpoint;
 	protected $redirectUri;
 	protected $consumerAuth;
 	
-	public function __construct( array $configuration = array(), EntityManager $em )
+	public function __construct( array $configuration = array(), People $people, EntityManager $em )
 	{
 		$this->configuration = $configuration;
 		$this->em            = $em;
+		$this->people        = $people;
 		$this->authEndpoint  = "https://api.ciscospark.com/v1/authorize";
 		$this->tokenEndpoint = "https://api.ciscospark.com/v1/access_token";
 		$this->redirectUri   = (isset($this->configuration['redirect_url'])) ? $this->configuration['redirect_url'] : null;

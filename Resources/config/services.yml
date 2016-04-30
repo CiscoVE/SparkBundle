@@ -12,6 +12,7 @@ services:
         class: '%cisco.spark.oauth.class%'
         arguments:
             - '%cisco.spark.config%'
+            - '@cisco.spark.people'
             - '@doctrine.orm.entity_manager'
     cisco.spark.room:
         class: '%cisco.spark.room.class%'
