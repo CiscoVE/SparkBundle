@@ -18,6 +18,10 @@ class Token
 	/** @ORM\Id @ORM\Column(name="client_id", type="string") */
 	protected $clientId;
 	
+	/** @ORM\Id @ORM\Column(name="clientPersonId", type="string") */
+	protected $clientPersonId;
+	
+	
 	
 	/**
 	 * Set sparkToken
@@ -59,6 +63,27 @@ class Token
 	public function getClientId()
 	{
 		return $this->clientId;
+	}
+	
+	/**
+	 * Set clientPersonId
+	 * @param string $cpid
+	 */
+	public function setClientPersonId( $cpid )
+	{
+		$this->clientPersonId = $cpid;
+	
+		return $this;
+	}
+	
+	/**
+	 * Get clientId
+	 *
+	 * @return string
+	 */
+	public function getClientPersonId()
+	{
+		return $this->clientPersonId;
 	}
 	
 	

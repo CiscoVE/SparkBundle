@@ -2,10 +2,12 @@
 namespace CiscoSystems\SparkBundle\Authentication;
 
 use \GuzzleHttp\Client;
+use \GuzzleHttp\Exception\RequestException;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Doctrine\ORM\EntityManager;
 use CiscoSystems\SparkBundle\Entity\Token as SparkToken;
 use CiscoSystems\SparkBundle\Authentication\HttpPost;
+use CiscoSystems\SparkBundle\Exception\ApiException;
 
 
 
@@ -24,6 +26,7 @@ class Oauth
 		$this->em            = $em;
 		$this->authEndpoint  = "https://api.ciscospark.com/v1/authorize";
 		$this->tokenEndpoint = "https://api.ciscospark.com/v1/access_token";
+		$this->accessToken   = "https://idbroker.webex.com/idb/oauth2/v1/access_token";
 		$this->redirectUri   = (isset($this->configuration['redirect_url'])) ? $this->configuration['redirect_url'] : null;
 		$this->consumerAuth  = 'https://idbroker.webex.com/idb/oauth2/v1/authorize';
 		if (isset($this->configuration['scope']))
@@ -35,6 +38,16 @@ class Oauth
 			$this->scope = 'spark:rooms_read spark:rooms_write spark:memberships_read spark:memberships_write spark:messages_read spark:messages_write spark:people_read';
 		}
 	}
+	
+	public function getBaseHeaders()
+	{
+		return array('Authorization' => $this->getStoredToken(),'content-type'  => 'application/json');
+	}
+	
+	public function getRefreshHeaders()
+	{
+		return array('Authorization' => $this->getNewToken(),'content-type'  => 'application/json');
+	}
 
 	public function getNewToken() 
 	{
@@ -42,8 +55,8 @@ class Oauth
 
 	   	if (isset($this->configuration['granttype']) && $this->configuration['granttype'] == 'saml2-bearer') {
 	   	
-	   		$token =  $this->getMachineToken();
-	   
+	   		$token 	 =  $this->getMachineToken();
+	   		
 	   	} else if (isset($this->configuration['granttype']) && $this->configuration['granttype'] == 'code')  {
 
 	   		$token = $this->getCodeToken();	
@@ -67,6 +80,25 @@ class Oauth
 	   		$newToken->setClientId($this->configuration['client_id']);
 	   		$this->em->persist($newToken);
 	   		$this->em->flush($newToken);	
+	   	}
+	   	
+	   	if (isset($this->configuration['granttype']) && $this->configuration['granttype'] == 'saml2-bearer') {
+	   	
+	   		$marray  =  $this->getMachinePersonId($this->configuration['machine_id']);
+	   	if ($marray){
+	   		$mid 	= (object)$marray[0];
+	   		echo $mid->id;
+	   		$buid 	= base64_encode("ciscospark://us/PEOPLE/" . $mid->id);
+	   		$buid   = str_replace('=','', $buid);
+
+	   		$updateMid = $this->em->getRepository('CiscoSystemsSparkBundle:Token')->find( $this->configuration['client_id'] );
+	   		$updateMid->setClientPersonId($buid);
+	   		$this->em->persist($updateMid);
+	   		$this->em->flush($updateMid);
+	   	}
+	   	
+	   	
+	   	
 	   	}
 	   	
 	return $token;	
@@ -97,7 +129,8 @@ class Oauth
 		} else {
 			throw new InvalidConfigurationException( "Either the 'client_id' and/or the 'client_secret' parameters are not configured in your config.yml file." );	
 		}
-			
+
+		
 		/* This will Start by getting us a bearer token that we need for the machine user */
 		$genClient   = new \GuzzleHttp\Client();
 		$response = $genClient->post($authlink, [
@@ -109,17 +142,17 @@ class Oauth
 		
 		$jsonarray 		= json_decode($response->getBody());
 		$bearerToken    = $jsonarray->BearerToken;
+		/* This  is the second part and will use the bearer token to issue an access token. */
 		
-		/* This  is the second part and will use the bearer token to issue an access token. */ 
 		$client = new \GuzzleHttp\Client();
-		$c2     = $client->post($this->tokenEndpoint, [
+		$c2     = $client->post($this->accessToken, [
 		 'headers'         => ['Authorization'=>$genericToken,'Content-Type'=>'application/x-www-form-urlencoded','user-agent'=>'Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0'],
-		 'body'            => "grant_type=urn:ietf:params:oauth:grant-type:saml2-bearer&assertion=".$bearerToken."&scope=".$this->scope,
+		 'body'            => "grant_type=urn:ietf:params:oauth:grant-type:saml2-bearer&assertion=".$bearerToken."&scope=".$this->scope
 		 ]);
-		
+
 		 $authresponse = json_decode($c2->getBody());
 		 $machineToken = "Bearer " . $authresponse->access_token;
-		
+		 
 		 return $machineToken; 
 	}
 	
@@ -290,6 +323,28 @@ class Oauth
 		}
 		return $accessToken;
 	
+	}
+	
+	public function getMachinePersonId($user = NULL){
+			
+		$client   = new \GuzzleHttp\Client();
+	
+		try{
+			$response = $client->get('https://conv-a.wbx2.com/conversation/api/v1/users/directory?q='.$user.'&includeMyBots=true', [
+					'headers'  => $this->getBaseHeaders() ]);
+		} catch (RequestException $e) {
+	
+			$statusCode = $e->getResponse()->getStatusCode();
+			if ($statusCode == '401')
+			{
+				$response = $client->get('https://conv-a.wbx2.com/conversation/api/v1/users/directory?q='.$user.'&includeMyBots=true', [
+						'headers'  => $this->getRefreshHeaders() ]);
+	
+			} else if ($statusCode != '200') {
+				return ApiException::errorMessage($statusCode);
+			}
+		}
+		return json_decode($response->getBody());
 	}
 	
 	
