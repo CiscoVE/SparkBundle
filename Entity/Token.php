@@ -12,14 +12,18 @@ use Doctrine\ORM\Mapping as ORM;
 class Token
 {
 	
+
+	
+	
+	/** 
+	 * @ORM\Id @ORM\Column(name="client_id", type="string") */
+	protected $clientId;
+	
 	/** @ORM\Column(name="token", type="string") */
 	protected $sparkToken;
 	
-	/** @ORM\Id @ORM\Column(name="client_id", type="string") */
-	protected $clientId;
-	
-	/** @ORM\Id @ORM\Column(name="clientPersonId", type="string") */
-	protected $clientPersonId;
+	/** @ORM\Column(name="machinePerson_id", type="string") */
+	protected $machinePersonId;
 	
 	
 	
@@ -66,24 +70,24 @@ class Token
 	}
 	
 	/**
-	 * Set clientPersonId
-	 * @param string $cpid
+	 * Set machinePersonId
+	 * @param string $mpid
 	 */
-	public function setClientPersonId( $cpid )
+	public function setMachinePersonId( $mpid )
 	{
-		$this->clientPersonId = $cpid;
+		$this->machinePersonId = $mpid;
 	
 		return $this;
 	}
 	
 	/**
-	 * Get clientId
+	 * Get machinePersonId
 	 *
 	 * @return string
 	 */
-	public function getClientPersonId()
+	public function getMachinePersonId()
 	{
-		return $this->clientPersonId;
+		return $this->machinePersonId;
 	}
 	
 	
