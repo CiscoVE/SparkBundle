@@ -55,7 +55,7 @@ class People  {
 			}
 		
 		}
-		return json_decode($response->getBody());	
+		return $response;	
 	}
 	
 	public function getPersonDetail($pid = '')
@@ -80,7 +80,7 @@ class People  {
 			}
 	
 		}
-		return json_decode($response->getBody());
+		return $response;
 	}
     
 	public function getMe()
@@ -105,7 +105,7 @@ class People  {
 			}
 	
 		}
-		return json_decode($response->getBody());
+		return $response;
 	}
 	
 	public function getMachinePersonId($user = NULL){
@@ -127,7 +127,7 @@ class People  {
 				return ApiException::errorMessage($statusCode);
 			}
 		}
-		return json_decode($response->getBody());
+		return $response;
 	}
 
 }

@@ -59,7 +59,7 @@ class Message  {
 			}
 		
 		}
-		return json_decode($response->getBody());		
+		return $response;
 	}
 	
 	public function createMessage($roomId = '', $text = '', $files = array(), $file = '', $toPersonId = '', $toPersonEmail = '')
@@ -107,7 +107,7 @@ class Message  {
 			}
 		
 		}
-		return json_decode($response->getBody());		
+		return $response;		
 	}
 	
 	public function getMessageDetails($mid = null)
@@ -131,7 +131,7 @@ class Message  {
 			}
 	
 		}	
-		return json_decode($response->getBody());
+		return $response;
 	}
 	
 	public function deleteMessage($mid = null)
@@ -158,7 +158,7 @@ class Message  {
 	
 		}
 	
-		return json_decode($response->getBody());
+		return $response;
 	}
 	
 	

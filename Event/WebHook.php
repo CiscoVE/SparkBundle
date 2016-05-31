@@ -54,7 +54,7 @@ class WebHook  {
 			}
 	
 		}
-		return json_decode($response->getBody());
+		return $response;
 	}
 	
 	public function createWebhook($name = "My Webhook", $targetUrl = '', $resource = "messages", $event = 'created', $filter = 'roomId=1234')
@@ -91,7 +91,7 @@ class WebHook  {
 			}
 		
 		}
-		return json_decode($response->getBody());	
+		return $response;	
 	}
 	
 	public function getWebhookDetails($wid = null)
@@ -117,7 +117,7 @@ class WebHook  {
 			}
 	
 		}	
-		return json_decode($response->getBody());
+		return $response;
 	}
 	
 	public function updateWebhook($wid = null, $name = 'My Webhook', $url = '')
@@ -149,7 +149,7 @@ class WebHook  {
 			}
 		
 		}
-		return json_decode($response->getBody());		
+		return $response;		
 	}
 	
 	public function deleteWebhook($wid = null)
@@ -174,7 +174,7 @@ class WebHook  {
 	
 		}
 	
-		return json_decode($response->getBody());
+		return $response;
 	}
 	
 	
