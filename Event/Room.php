@@ -30,6 +30,38 @@ class Room  {
 		return array('Authorization' => $this->oauth->getNewToken(),'content-type'  => 'application/json');
 	}
 	
+	public function getRooms($options = array())
+	{
+		$queryParams = array();
+		if (isset($options['type'])) 	{ $queryParams['type'] 		= $options['type']; } /* direct or group */
+		if (isset($options['max'])) 	{ $queryParams['max'] 		= $options['max']; }
+		if (isset($options['cursor'])) 	{ $queryParams['cursor'] 	= $options['cursor']; }
+	
+		$client  = new Client();
+		try{
+			$response = $client->request("GET", self::ROOMURI, array(
+					'headers'       => $this->getBaseHeaders(),
+					'query'         => $queryParams
+			));
+		} catch (RequestException $e) {
+	
+			$statusCode = $e->getResponse()->getStatusCode();
+	
+			if ($statusCode == '401')
+			{
+	
+				$response = $client->request("GET", self::ROOMURI, array(
+						'headers'       => $this->getRefreshHeaders(),
+						'query'         => $queryParams
+				));
+			} else if ($statusCode != '200') {
+				return ApiException::errorMessage($statusCode);
+			}
+	
+		}
+		return $response;
+	}
+	
 	public function createRoom($title = "New Room")
 	{
 		$roomJson = '{"title":"'.$title.'"}';
@@ -53,7 +85,7 @@ class Room  {
 
 		}
 		
-		return json_decode($response->getBody());
+		return $response;
 	}
 	
 	public function getRoomDetails($rid = null, $showSipAddress = 'FALSE')
@@ -82,7 +114,7 @@ class Room  {
 	
 		}
 	
-		return json_decode($response->getBody());
+		return $response;
 	}
     
 	public function updateRoom( $rid = null, $title = 'Default Room Title' )
@@ -109,7 +141,7 @@ class Room  {
 			}
 		
 		}
-		return json_decode($response->getBody());
+		return $response;
 	}
 	
 	public function deleteRoom( $rid = null )
@@ -133,7 +165,7 @@ class Room  {
 			}
 	
 		}
-		return json_decode($response->getBody());
+		return $response;
 	}
 
 }

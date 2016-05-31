@@ -38,6 +38,7 @@ class Membership  {
 		if (isset($options['personId'])) { $queryParams['personId'] = $options['personId']; }
 		if (isset($options['personEmail'])) { $queryParams['personEmail'] = $options['personEmail']; }
 		if (isset($options['max'])) { $queryParams['max'] = $options['max']; }
+		if (isset($options['cursor'])) { $queryParams['cursor'] = $options['cursor']; }
 		
 		$client  = new Client();
 		try{
@@ -61,11 +62,11 @@ class Membership  {
 			}
 	
 		}
-		return json_decode($response->getBody());	
+		return $response;	
 	}
 	
 	/*  
-	 * Paramters: String $roomId, Array $options
+	 * Parameters: String $roomId, Array $options
 	 * $roomId is Required.
 	 * Option array should be key => value pairs with keys: personId, PersonEmail, isModerator
 	 * return array();
@@ -107,7 +108,7 @@ class Membership  {
 			}
 		
 		}
-		return json_decode($response->getBody());	
+		return $response;	
 	}
 	
 	public function getMembershipDetail($mid = '')
@@ -132,7 +133,7 @@ class Membership  {
 				}
 		
 			}
-			return json_decode($response->getBody());
+			return $response;
 	}
 	
 	public function updateMembership($mid = '', $isModerator = '')
@@ -161,7 +162,7 @@ class Membership  {
 			}
 		
 		}
-		return json_decode($response->getBody());
+		return $response;
 	}
 
 	public function deleteMembership( $mid = '' )
@@ -185,7 +186,7 @@ class Membership  {
 			}
 		
 		}
-	return json_decode($response->getBody());
+	return $response;
 	}
 
 }
