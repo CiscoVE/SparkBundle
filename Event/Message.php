@@ -41,7 +41,8 @@ class Message  {
 		try{
 			$response = $client->request("GET", self::MESSAGESURI, array(
 					'headers'       => $this->getBaseHeaders(),
-					'query'         => $queryParams
+					'query'         => $queryParams,
+					'verify' 		=> false
 			));
 		} catch (RequestException $e) {
 		
@@ -52,7 +53,8 @@ class Message  {
 		
 				$response = $client->request("GET", self::MESSAGESURI, array(
 						'headers'       => $this->getRefreshHeaders(),
-						'query'         => $queryParams
+						'query'         => $queryParams,
+						'verify' 		=> false
 				));
 			} else if ($statusCode != '200') {
 				return ApiException::errorMessage($statusCode);
@@ -89,7 +91,8 @@ class Message  {
 		try{
 			$response = $client->request("POST", self::MESSAGESURI, array(
 					'headers'       => $this->getBaseHeaders(),
-					'body'          => $mJson
+					'body'          => $mJson,
+					'verify' 		=> false
 			));
 		} catch (RequestException $e) {
 		
@@ -100,7 +103,8 @@ class Message  {
 		
 				$response = $client->request("POST", self::MESSAGESURI, array(
 						'headers'       => $this->getRefreshHeaders(),
-						'body'          => $mJson
+						'body'          => $mJson,
+						'verify' 		=> false
 				));
 			} else if ($statusCode != '200') {
 				return ApiException::errorMessage($statusCode);
@@ -116,7 +120,8 @@ class Message  {
 	
 		try{
 			$response = $client->request('GET', $mid, array(
-					'headers'       => $this->getBaseHeaders()
+					'headers'       => $this->getBaseHeaders(),
+					'verify' 		=> false
 			));
 		} catch (RequestException $e) {
 	
@@ -124,7 +129,8 @@ class Message  {
 			if ($statusCode == '401')
 			{
 				$response = $client->request('GET', $mid, array(
-						'headers'       => $this->getRefreshHeaders()
+						'headers'       => $this->getRefreshHeaders(),
+						'verify' 		=> false
 				));
 			} else if ($statusCode != '200') {
 				return ApiException::errorMessage($statusCode);
@@ -142,7 +148,8 @@ class Message  {
 	
 		try{
 			$response = $client->request('DELETE', $mid, array(
-					'headers'       => $this->getBaseHeaders()
+					'headers'       => $this->getBaseHeaders(),
+					'verify' 		=> false
 			));
 		} catch (RequestException $e) {
 	
@@ -150,7 +157,8 @@ class Message  {
 			if ($statusCode == '401')
 			{
 				$response = $client->request('DELETE', $mid, array(
-						'headers'       => $this->getRefreshHeaders()
+						'headers'       => $this->getRefreshHeaders(),
+						'verify' 		=> false
 				));
 			} else if ($statusCode != '204') {
 				return ApiException::errorMessage($statusCode);

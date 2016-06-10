@@ -37,7 +37,8 @@ class People  {
 		try{
 			$response = $client->request("GET", self::PEOPLEURI, array(
 					'headers'       => $this->getBaseHeaders(),
-					'query'         => $queryParams
+					'query'         => $queryParams,
+					'verify' 		=> false
 			));
 		} catch (RequestException $e) {
 		
@@ -65,7 +66,8 @@ class People  {
 	
 		try{
 			$response = $client->request('GET', $pid, array(
-					'headers'       => $this->getBaseHeaders()
+					'headers'       => $this->getBaseHeaders(),
+					'verify' 		=> false
 			));
 		} catch (RequestException $e) {
 	
@@ -73,7 +75,8 @@ class People  {
 			if ($statusCode == '401')
 			{
 				$response = $client->request('get', $pid, array(
-						'headers' => $this->getRefreshHeaders()
+						'headers' => $this->getRefreshHeaders(),
+						'verify'  => false
 				));
 			} else if ($statusCode != '200') {
 				return ApiException::errorMessage($statusCode);
@@ -90,7 +93,8 @@ class People  {
 	
 		try{
 			$response = $client->request('GET','me', array(
-					'headers'       => $this->getBaseHeaders()
+					'headers'       => $this->getBaseHeaders(),
+					'verify' 		=> false
 			));
 		} catch (RequestException $e) {
 	
@@ -98,7 +102,8 @@ class People  {
 			if ($statusCode == '401')
 			{
 				$response = $client->request('get','me', array(
-						'headers' => $this->getRefreshHeaders()
+						'headers' => $this->getRefreshHeaders(),
+						'verify' 		=> false
 				));
 			} else if ($statusCode != '200') {
 				return ApiException::errorMessage($statusCode);
@@ -114,14 +119,18 @@ class People  {
 	
 		try{
 			$response = $client->get('https://conv-a.wbx2.com/conversation/api/v1/users/directory?q='.$user.'&includeMyBots=true', [
-				'headers'  => $this->getBaseHeaders() ]);
+				'headers'  => $this->getBaseHeaders(),
+					'verify' 		=> false
+			]);
 		} catch (RequestException $e) {
 		
 			$statusCode = $e->getResponse()->getStatusCode();
 			if ($statusCode == '401')
 			{
 				$response = $client->get('https://conv-a.wbx2.com/conversation/api/v1/users/directory?q='.$user.'&includeMyBots=true', [
-						'headers'  => $this->getRefreshHeaders() ]);
+						'headers'  => $this->getRefreshHeaders(),
+						'verify' 		=> false
+				]);
 				
 			} else if ($statusCode != '200') {
 				return ApiException::errorMessage($statusCode);

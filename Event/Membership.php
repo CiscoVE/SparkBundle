@@ -44,7 +44,8 @@ class Membership  {
 		try{
 		$response = $client->request("GET", self::MEMBERSHIPURI, array(
 				'headers'       => $this->getBaseHeaders(),
-				'query'         => $queryParams
+				'query'         => $queryParams,
+				'verify' 		=> false
 		));
 		} catch (RequestException $e) {
 	
@@ -55,7 +56,8 @@ class Membership  {
 	
 				$response = $client->request("GET", self::MEMBERSHIPURI, array(
 				'headers'       => $this->getRefreshHeaders(),
-				'query'         => $queryParams
+				'query'         => $queryParams,
+						'verify' 		=> false
 				));
 			} else if ($statusCode != '200') {
 				return ApiException::errorMessage($statusCode);
@@ -90,7 +92,8 @@ class Membership  {
 		try{
 			$response = $client->post(self::MEMBERSHIPURI, array(
 					'headers'       => $this->getBaseHeaders(),
-					'body'          => $mJson
+					'body'          => $mJson,
+					'verify' 		=> false
 			));
 		} catch (RequestException $e) {
 		
@@ -101,7 +104,8 @@ class Membership  {
 		
 				$response = $client->post(self::MEMBERSHIPURI, array(
 						'headers'       => $this->getRefreshHeaders(),
-						'body'          => $mJson
+						'body'          => $mJson,
+						'verify' 		=> false
 				));
 			} else if ($statusCode != '200') {
 				return ApiException::errorMessage($statusCode);
@@ -118,7 +122,8 @@ class Membership  {
 		
 			try{
 				$response = $client->request('GET', $mid, array(
-							'headers'       => $this->getBaseHeaders()
+							'headers'       => $this->getBaseHeaders(),
+						'verify' 		=> false
 				));
 			} catch (RequestException $e) {
 		
@@ -126,7 +131,8 @@ class Membership  {
 				if ($statusCode == '401')
 				{
 					$response = $client->request('get', $mid, array(
-							'headers' => $this->getRefreshHeaders()
+							'headers' => $this->getRefreshHeaders(),
+							'verify' 		=> false
 					));
 				} else if ($statusCode != '200') {
 					return ApiException::errorMessage($statusCode);
@@ -146,7 +152,8 @@ class Membership  {
 		try{
 			$response = $client->request('PUT', $mid, array(
 					'headers'   => $this->getBaseHeaders(),
-					'body'		=> $mJson
+					'body'		=> $mJson,
+					'verify' 		=> false
 			));
 		} catch (RequestException $e) {
 		
@@ -155,7 +162,8 @@ class Membership  {
 			{
 				$response = $client->request('PUT', $mid, array(
 						'headers' => $this->getRefreshHeaders(),
-						'body'	  => $mJson
+						'body'	  => $mJson,
+						'verify' 		=> false
 				));
 			} else if ($statusCode != '200') {
 				return ApiException::errorMessage($statusCode);
@@ -171,7 +179,8 @@ class Membership  {
 		
 		try{
 			$response = $client->request('DELETE', $mid, array(
-						'headers'   => $this->getBaseHeaders()					
+						'headers'   => $this->getBaseHeaders(),
+					'verify' 		=> false
 			));
 		} catch (RequestException $e) {
 		
@@ -179,7 +188,8 @@ class Membership  {
 			if ($statusCode == '401')
 			{
 				$response = $client->request('DELETE', $mid, array(
-						'headers' => $this->getRefreshHeaders()
+						'headers' => $this->getRefreshHeaders(),
+						'verify' 		=> false
 				));
 			} else if ($statusCode != '204') {
 				return ApiException::errorMessage($statusCode);

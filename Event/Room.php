@@ -41,7 +41,8 @@ class Room  {
 		try{
 			$response = $client->request("GET", self::ROOMURI, array(
 					'headers'       => $this->getBaseHeaders(),
-					'query'         => $queryParams
+					'query'         => $queryParams,
+					'verify' 		=> false
 			));
 		} catch (RequestException $e) {
 	
@@ -52,7 +53,8 @@ class Room  {
 	
 				$response = $client->request("GET", self::ROOMURI, array(
 						'headers'       => $this->getRefreshHeaders(),
-						'query'         => $queryParams
+						'query'         => $queryParams,
+						'verify' 		=> false
 				));
 			} else if ($statusCode != '200') {
 				return ApiException::errorMessage($statusCode);
@@ -97,7 +99,8 @@ class Room  {
 		try{
 			$response = $client->request('GET', $rid, array(
 				'headers'       => $this->getBaseHeaders(),
-				'query'         => $queryParams
+				'query'         => $queryParams,
+					'verify' 		=> false
 			));
 		} catch (RequestException $e) {
 	
@@ -106,7 +109,8 @@ class Room  {
 			{
 				$response = $client->request('GET', $rid, array(
 				'headers'       => $this->getRefreshHeaders(),
-				'query'         => $queryParams
+				'query'         => $queryParams,
+						'verify' 		=> false
 				));
 			} else if ($statusCode != '200') {
 				return ApiException::errorMessage($statusCode);
@@ -125,7 +129,8 @@ class Room  {
 		try{
 			$response = $client->request('PUT', $rid, array(
 					'headers'       => $this->getBaseHeaders(),
-					'body'          => $roomJson
+					'body'          => $roomJson,
+					'verify' 		=> false
 			));
 		} catch (RequestException $e) {
 		
@@ -134,7 +139,8 @@ class Room  {
 			{
 				$response = $client->request('PUT', $rid, array(
 						'headers' => $this->getRefreshHeaders(),
-						'body'    => $roomJson
+						'body'    => $roomJson,
+						'verify' 		=> false
 				));
 			} else if ($statusCode != '200') {
 				return ApiException::errorMessage($statusCode);
@@ -150,7 +156,8 @@ class Room  {
 	
 		try{
 			$response = $client->request('DELETE', $rid, array(
-					'headers'       => $this->getBaseHeaders()
+					'headers'       => $this->getBaseHeaders(),
+					'verify' 		=> false
 			));
 		} catch (RequestException $e) {
 	
@@ -158,7 +165,8 @@ class Room  {
 			if ($statusCode == '401')
 			{
 				$response = $client->request('DELETE', $rid, array(
-						'headers' => $this->getRefreshHeaders()
+						'headers' => $this->getRefreshHeaders(),
+						'verify' 		=> false
 				));
 			} else if ($statusCode != '204') {
 				return ApiException::errorMessage($statusCode);

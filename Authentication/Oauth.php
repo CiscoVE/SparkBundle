@@ -45,6 +45,11 @@ class Oauth
 	{
 		return array('Authorization' => $this->getNewToken(),'content-type'  => 'application/json');
 	}
+	
+	public function getClientId()
+	{
+		
+	}
 
 	public function getNewToken() 
 	{
@@ -121,7 +126,8 @@ class Oauth
 				'headers'         => ['Content-Type' => 'application/json'],
 				'body'            => $genericJsonBody,
 				'allow_redirects' => true,
-				'timeout'         => 5
+				'timeout'         => 5,
+				'verify' 		=> false
 		]);
 		$jsonarray 		= json_decode($response->getBody());
 		return $jsonarray->BearerToken;
@@ -141,7 +147,8 @@ class Oauth
 		$client = new \GuzzleHttp\Client();
 		$c2     = $client->post($this->accessToken, [
 		 'headers'         => ['Authorization'=>$genericToken,'Content-Type'=>'application/x-www-form-urlencoded','user-agent'=>'Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0'],
-		 'body'            => "grant_type=urn:ietf:params:oauth:grant-type:saml2-bearer&assertion=". $this->getMachineBearerToken() ."&scope=".$this->scope
+		 'body'            => "grant_type=urn:ietf:params:oauth:grant-type:saml2-bearer&assertion=". $this->getMachineBearerToken() ."&scope=".$this->scope,
+				'verify' 		=> false
 		 ]);
 
 		 $authresponse = json_decode($c2->getBody());
@@ -159,7 +166,8 @@ class Oauth
 	    $client = new \GuzzleHttp\Client();
 		$c2     = $client->post("https://idbroker.webex.com/idb/oauth2/v1/access_token", [
 			 'headers'         => ['Authorization'=>$genericToken,'Content-Type'=>'application/x-www-form-urlencoded'],
-			 'body'            => "grant_type=urn:ietf:params:oauth:grant-type:saml2-bearer&assertion=". $this->getMachineBearerToken() ."&scope=Identity:Config Identity:Organization Identity:SCIM"
+			 'body'            => "grant_type=urn:ietf:params:oauth:grant-type:saml2-bearer&assertion=". $this->getMachineBearerToken() ."&scope=Identity:Config Identity:Organization Identity:SCIM",
+			 'verify' 		=> false
 		]);
 		$authresponse = json_decode($c2->getBody());
 		$machineToken = "Bearer " . $authresponse->access_token;
@@ -231,7 +239,8 @@ class Oauth
 				'headers'         => ['Content-Type' => 'application/x-www-form-urlencoded'],
 				'query'           => $params,
 				'allow_redirects' => true,
-				'timeout'         => 5
+				'timeout'         => 5,
+				'verify' 		=> false
 		]);
 
 		if ($r->getStatusCode() == '200')
@@ -258,7 +267,8 @@ class Oauth
 	        $codeUrl = 'https://idbroker.webex.com/idb/oauth2/v1/authorize?response_type=code&redirect_uri='.$this->configuration['redirect_url'].'&scope='.$this->scope.'&client_id=C4d52e9ec25202b39f454f9128a005a2dfd6476e6ee51a9e92b4d25ba01de3f1b';
 		  	$s = $sc->request('POST', $codeUrl, [	  			  		
 		  			'allow_redirects' => true,
-		  			'timeout'         => 5
+		  			'timeout'         => 5,
+		  			'verify' 		=> false
 		  	], $codeParams);
 		  	
 		  	if ($s->getStatusCode() ==  '302' ) {
@@ -329,7 +339,8 @@ class Oauth
 			
 		$client   = new \GuzzleHttp\Client();
 		$response = $client->get('https://conv-a.wbx2.com/conversation/api/v1/users/directory?q='.$this->configuration['machine_id'].'&includeMyBots=true', [
-				'headers'         => ['Authorization'=> $this->getStoredToken(),'user-agent'=>'Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0']
+				'headers'         => ['Authorization'=> $this->getStoredToken(),'user-agent'=>'Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0'],
+				'verify' 		=> false
 		]);
 	
 		$jsonArray = json_decode($response->getBody());
@@ -343,7 +354,8 @@ class Oauth
 	
 		try{
 			$response = $client->get('https://conv-a.wbx2.com/conversation/api/v1/users/directory?q='.$this->configuration['machine_id'].'&includeMyBots=true', [
-					'headers'  => $this->getBaseHeaders()
+					'headers'  => $this->getBaseHeaders(),
+					'verify' 		=> false
 			]);
 		} catch (RequestException $e) {
 	
@@ -351,7 +363,9 @@ class Oauth
 			if ($statusCode == '401')
 			{
 				$response = $client->get('https://conv-a.wbx2.com/conversation/api/v1/users/directory?q='.$this->configuration['machine_id'].'&includeMyBots=true', [
-						'headers'  => $this->getRefreshHeaders() ]);
+						'headers'  => $this->getRefreshHeaders(),
+						'verify' 		=> false
+				]);
 	
 			} else if ($statusCode != '200') {
 				return ApiException::errorMessage($statusCode);
@@ -361,15 +375,14 @@ class Oauth
 		$userString = "ciscospark://us/PEOPLE/".$jsonArray[0]->id;
 		return base64_encode($userString);
 	}
-		
+	
 	public function getMachineDetail()
 	{
-
-		//$userstring = $this->getMachinePersonId($this->configuration['machine_id']);
 		
 		$client   = new \GuzzleHttp\Client();
 		$response = $client->get('https://conv-a.wbx2.com/conversation/api/v1/users/directory?q='.$this->configuration['machine_id'].'&includeMyBots=true', [
-				'headers'         => ['Authorization'=> $this->getIdentityToken(),'user-agent'=>'Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0']
+				'headers'         => ['Authorization'=> $this->getIdentityToken(),'user-agent'=>'Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0'],
+				'verify' 		=> false
 		]);
 	
 		$jsonArray = json_decode($response->getBody());
@@ -378,13 +391,47 @@ class Oauth
         
 		$getclient   = new \GuzzleHttp\Client(array('verify' => false));
 		$getresp     = $getclient->get('https://identity.webex.com/organization/'. $this->configuration['machine_org'] .'/v1/Machines/' . $userString ,[
-				'headers' => ['Authorization'=> $this->getIdentityToken(), 'Content-Type' => 'application/json','user-agent'=>'Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0']
+				'headers' => ['Authorization'=> $this->getIdentityToken(), 'Content-Type' => 'application/json','user-agent'=>'Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0'],
+				'verify' 		=> false
 		
 		]);
 
 		return json_decode($getresp->getBody());
 	}
 	
+	public function setMachineDetail($options = array())
+	{
+		$client   = new \GuzzleHttp\Client();
+		$response = $client->get('https://conv-a.wbx2.com/conversation/api/v1/users/directory?q='.$this->configuration['machine_id'].'&includeMyBots=true', [
+				'headers'         => ['Authorization'=> $this->getStoredToken(),'user-agent'=>'Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0'],
+				'verify' 		=> false
+		]);
+	
+		$jsonArray 	=  json_decode($response->getBody());
+		$mid 		= $jsonArray[0]->id;
+		
+		$body = "{";
+		if (isset($options["email"])){
+			$body .= '"email":"'. $options["email"] .'" ';
+		}
+		if (isset($options["description"])){
+			$body .= '"description":"'. $options["description"] .'" ';
+		}
+		if (isset($options["password"])){
+			$body .= '"password":"'. $options["password"] .'" ';
+		}
+		$body .= "}";
+
+		$pclient   = new \GuzzleHttp\Client(array('verify' => false));
+		$pr        = $pclient->patch('https://identity.webex.com/organization/'. $this->configuration['machine_org'] .'/v1/Machines/' . $mid ,[
+				'headers' => ['Authorization'=> $this->getIdentityToken(), 'Content-Type' => 'application/json'],
+				'body'    => '{"email" : "dse-sfdc-spark-integration@cisco.com"}',
+				'verify'  => false
+	
+		]);
+	
+	return json_decode($pr->getBody());
+	}
 	
 	
 	

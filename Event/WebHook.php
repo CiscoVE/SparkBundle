@@ -36,7 +36,8 @@ class WebHook  {
 		try{
 			$response = $client->request("GET", self::WEBHOOKURI, array(
 					'headers'       => $this->getBaseHeaders(),
-					'query'         => $queryParams
+					'query'         => $queryParams,
+					'verify' 		=> false
 			));
 		} catch (RequestException $e) {
 	
@@ -47,7 +48,8 @@ class WebHook  {
 	
 				$response = $client->request("GET", self::WEBHOOKURI, array(
 						'headers'       => $this->getRefreshHeaders(),
-						'query'         => $queryParams
+						'query'         => $queryParams,
+						'verify' 		=> false
 				));
 			} else if ($statusCode != '200') {
 				return ApiException::errorMessage($statusCode);
@@ -73,7 +75,8 @@ class WebHook  {
 		try{
 			$response = $client->request("POST", self::WEBHOOKURI, array(
 					'headers'       => $this->getBaseHeaders(),
-					'body'          => $whJson
+					'body'          => $whJson,
+					'verify' 		=> false
 			));
 		} catch (RequestException $e) {
 		
@@ -84,7 +87,8 @@ class WebHook  {
 		
 				$response = $client->request("POST", self::WEBHOOKURI, array(
 						'headers'       => $this->getRefreshHeaders(),
-						'body'          => $whJson
+						'body'          => $whJson,
+						'verify' 		=> false
 				));
 			} else if ($statusCode != '200') {
 				return ApiException::errorMessage($statusCode);
@@ -102,7 +106,8 @@ class WebHook  {
 	
 		try{
 			$response = $client->request('GET', $wid, array(
-					'headers'       => $this->getBaseHeaders()
+					'headers'       => $this->getBaseHeaders(),
+					'verify' 		=> false
 			));
 		} catch (RequestException $e) {
 	
@@ -110,7 +115,8 @@ class WebHook  {
 			if ($statusCode == '401')
 			{
 				$response = $client->request('GET', $wid, array(
-						'headers'       => $this->getRefreshHeaders()
+						'headers'       => $this->getRefreshHeaders(),
+						'verify' 		=> false
 				));
 			} else if ($statusCode != '200') {
 				return ApiException::errorMessage($statusCode);
@@ -133,7 +139,8 @@ class WebHook  {
 		try{
 			$response = $client->request('PUT', $wid, array(
 					'headers'       => $this->getBaseHeaders(),
-					'body'          => $whJson
+					'body'          => $whJson,
+					'verify' 		=> false
 			));
 		} catch (RequestExceptionAP $e) {
 		
@@ -142,7 +149,8 @@ class WebHook  {
 			{
 				$response = $client->request('PUT', $wid, array(
 						'headers'       => $this->getRefreshHeaders(),
-						'body'          => $whJson
+						'body'          => $whJson,
+						'verify' 		=> false
 				));
 			} else if ($statusCode != '200') {
 				return ApiException::errorMessage($statusCode);
@@ -160,7 +168,8 @@ class WebHook  {
 	
 		try{
 			$response = $client->request('DELETE', $wid, array(
-						'headers'       => $this->getBaseHeaders()
+						'headers'       => $this->getBaseHeaders(),
+					'verify' 		=> false
 			));
 		} catch (RequestException $e) {
 	
@@ -168,7 +177,8 @@ class WebHook  {
 			if ($statusCode == '401')
 			{
 				$response = $client->request('DELETE', $wid, array(
-						'headers'       => $this->getRefreshHeaders()
+						'headers'       => $this->getRefreshHeaders(),
+						'verify' 		=> false
 				));
 			}
 	
