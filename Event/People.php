@@ -2,7 +2,7 @@
 namespace CiscoSystems\SparkBundle\Event;
 
 use \GuzzleHttp\Client;
-use \GuzzleHttp\Exception\RequestException;
+use \GuzzleHttp\Exception\ClientException;
 use CiscoSystems\SparkBundle\Authentication\Oauth;
 use CiscoSystems\SparkBundle\Exception\ApiException;
 
@@ -40,18 +40,18 @@ class People  {
 					'query'         => $queryParams,
 					'verify' 		=> false
 			));
-		} catch (RequestException $e) {
-		
-			$statusCode = $e->getResponse()->getStatusCode();
-		
-			if ($statusCode == '401')
+		} catch (ClientException $e) {
+			$errorResponse = $e->getResponse();
+			$statusCode = $errorResponse->getStatusCode();
+				
+			if ($statusCode == 401)
 			{
 		
 				$response = $client->request("GET", self::PEOPLEURI, array(
 						'headers'       => $this->getRefreshHeaders(),
 						'query'         => $queryParams
 				));
-			} else if ($statusCode != '200') {
+			} else if ($statusCode != 200) {
 				return ApiException::errorMessage($statusCode);
 			}
 		
@@ -69,16 +69,17 @@ class People  {
 					'headers'       => $this->getBaseHeaders(),
 					'verify' 		=> false
 			));
-		} catch (RequestException $e) {
-	
-			$statusCode = $e->getResponse()->getStatusCode();
-			if ($statusCode == '401')
+		} catch (ClientException $e) {
+			$errorResponse = $e->getResponse();
+			$statusCode = $errorResponse->getStatusCode();
+				
+			if ($statusCode == 401)
 			{
 				$response = $client->request('get', $pid, array(
 						'headers' => $this->getRefreshHeaders(),
 						'verify'  => false
 				));
-			} else if ($statusCode != '200') {
+			} else if ($statusCode != 200) {
 				return ApiException::errorMessage($statusCode);
 			}
 	
@@ -96,16 +97,17 @@ class People  {
 					'headers'       => $this->getBaseHeaders(),
 					'verify' 		=> false
 			));
-		} catch (RequestException $e) {
-	
-			$statusCode = $e->getResponse()->getStatusCode();
-			if ($statusCode == '401')
+		} catch (ClientException $e) {
+			$errorResponse = $e->getResponse();
+			$statusCode = $errorResponse->getStatusCode();
+				
+			if ($statusCode == 401)
 			{
 				$response = $client->request('get','me', array(
 						'headers' => $this->getRefreshHeaders(),
 						'verify' 		=> false
 				));
-			} else if ($statusCode != '200') {
+			} else if ($statusCode != 200) {
 				return ApiException::errorMessage($statusCode);
 			}
 	
@@ -120,19 +122,20 @@ class People  {
 		try{
 			$response = $client->get('https://conv-a.wbx2.com/conversation/api/v1/users/directory?q='.$user.'&includeMyBots=true', [
 				'headers'  => $this->getBaseHeaders(),
-					'verify' 		=> false
+				'verify'   => false
 			]);
-		} catch (RequestException $e) {
-		
-			$statusCode = $e->getResponse()->getStatusCode();
-			if ($statusCode == '401')
+		} catch (ClientException $e) {
+			$errorResponse = $e->getResponse();
+			$statusCode = $errorResponse->getStatusCode();
+				
+			if ($statusCode == 401)
 			{
 				$response = $client->get('https://conv-a.wbx2.com/conversation/api/v1/users/directory?q='.$user.'&includeMyBots=true', [
 						'headers'  => $this->getRefreshHeaders(),
 						'verify' 		=> false
 				]);
 				
-			} else if ($statusCode != '200') {
+			} else if ($statusCode != 200) {
 				return ApiException::errorMessage($statusCode);
 			}
 		}

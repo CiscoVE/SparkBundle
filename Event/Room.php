@@ -2,7 +2,7 @@
 namespace CiscoSystems\SparkBundle\Event;
 
 use \GuzzleHttp\Client;
-use \GuzzleHttp\Exception\RequestException;
+use \GuzzleHttp\Exception\ClientException;
 use \GuzzleHttp\Psr7\Request;
 use CiscoSystems\SparkBundle\Authentication\Oauth;
 use CiscoSystems\SparkBundle\Exception\ApiException;
@@ -44,11 +44,11 @@ class Room  {
 					'query'         => $queryParams,
 					'verify' 		=> false
 			));
-		} catch (RequestException $e) {
-	
-			$statusCode = $e->getResponse()->getStatusCode();
-	
-			if ($statusCode == '401')
+		} catch (ClientException $e) {
+			$errorResponse = $e->getResponse();
+			$statusCode = $errorResponse->getStatusCode();
+			
+			if ($statusCode == 401)
 			{
 	
 				$response = $client->request("GET", self::ROOMURI, array(
@@ -56,7 +56,7 @@ class Room  {
 						'query'         => $queryParams,
 						'verify' 		=> false
 				));
-			} else if ($statusCode != '200') {
+			} else if ($statusCode != 200) {
 				return ApiException::errorMessage($statusCode);
 			}
 	
@@ -73,15 +73,16 @@ class Room  {
 		
 		try{
 			$response = $client->send($baseRequest);
-		} catch (RequestException $e) {
-          
-        	$statusCode = $e->getResponse()->getStatusCode();
-          	if ($statusCode == '401')
-          	{
+		} catch (ClientException $e) {
+			$errorResponse = $e->getResponse();
+			$statusCode = $errorResponse->getStatusCode();
+			
+			if ($statusCode == 401)
+			{
 	
           	$request  = $baseRequest->withHeader('Authorization', $this->oauth->getNewToken());
           	$response = $client->send($request);
-          	} else if ($statusCode != '200') {
+          	} else if ($statusCode != 200) {
 				return ApiException::errorMessage($statusCode);
 			}
 
@@ -100,19 +101,20 @@ class Room  {
 			$response = $client->request('GET', $rid, array(
 				'headers'       => $this->getBaseHeaders(),
 				'query'         => $queryParams,
-					'verify' 		=> false
+				'verify' 		=> false
 			));
-		} catch (RequestException $e) {
-	
-			$statusCode = $e->getResponse()->getStatusCode();
-			if ($statusCode == '401')
+		} catch (ClientException $e) {
+			$errorResponse = $e->getResponse();
+			$statusCode = $errorResponse->getStatusCode();
+			
+			if ($statusCode == 401)
 			{
 				$response = $client->request('GET', $rid, array(
 				'headers'       => $this->getRefreshHeaders(),
 				'query'         => $queryParams,
-						'verify' 		=> false
+				'verify' 		=> false
 				));
-			} else if ($statusCode != '200') {
+			} else if ($statusCode != 200) {
 				return ApiException::errorMessage($statusCode);
 			}
 	
@@ -132,17 +134,18 @@ class Room  {
 					'body'          => $roomJson,
 					'verify' 		=> false
 			));
-		} catch (RequestException $e) {
-		
-			$statusCode = $e->getResponse()->getStatusCode();
-			if ($statusCode == '401')
+		} catch (ClientException $e) {
+			$errorResponse = $e->getResponse();
+			$statusCode = $errorResponse->getStatusCode();
+			
+			if ($statusCode == 401)
 			{
 				$response = $client->request('PUT', $rid, array(
 						'headers' => $this->getRefreshHeaders(),
 						'body'    => $roomJson,
 						'verify' 		=> false
 				));
-			} else if ($statusCode != '200') {
+			} else if ($statusCode != 200) {
 				return ApiException::errorMessage($statusCode);
 			}
 		
@@ -159,16 +162,17 @@ class Room  {
 					'headers'       => $this->getBaseHeaders(),
 					'verify' 		=> false
 			));
-		} catch (RequestException $e) {
-	
-			$statusCode = $e->getResponse()->getStatusCode();
-			if ($statusCode == '401')
+		} catch (ClientException $e) {
+			$errorResponse = $e->getResponse();
+			$statusCode = $errorResponse->getStatusCode();
+			
+			if ($statusCode == 401)
 			{
 				$response = $client->request('DELETE', $rid, array(
 						'headers' => $this->getRefreshHeaders(),
 						'verify' 		=> false
 				));
-			} else if ($statusCode != '204') {
+			} else if ($statusCode != 204) {
 				return ApiException::errorMessage($statusCode);
 			}
 	

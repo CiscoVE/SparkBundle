@@ -2,7 +2,7 @@
 namespace CiscoSystems\SparkBundle\Event;
 
 use \GuzzleHttp\Client;
-use \GuzzleHttp\Exception\RequestException;
+use \GuzzleHttp\Exception\ClientException;
 use CiscoSystems\SparkBundle\Authentication\Oauth;
 use CiscoSystems\SparkBundle\Exception\ApiException;
 
@@ -47,19 +47,20 @@ class Membership  {
 				'query'         => $queryParams,
 				'verify' 		=> false
 		));
-		} catch (RequestException $e) {
-	
-			$statusCode = $e->getResponse()->getStatusCode();
-
-			if ($statusCode == '401')
+		} catch (ClientException $e) {
+				
+			$errorResponse = $e->getResponse();
+			$statusCode = $errorResponse->getStatusCode();
+		
+			if ($statusCode == 401)
 			{
 	
 				$response = $client->request("GET", self::MEMBERSHIPURI, array(
 				'headers'       => $this->getRefreshHeaders(),
 				'query'         => $queryParams,
-						'verify' 		=> false
+				'verify' 		=> false
 				));
-			} else if ($statusCode != '200') {
+			} else if ($statusCode != 200) {
 				return ApiException::errorMessage($statusCode);
 			}
 	
@@ -95,11 +96,11 @@ class Membership  {
 					'body'          => $mJson,
 					'verify' 		=> false
 			));
-		} catch (RequestException $e) {
-		
-			$statusCode = $e->getResponse()->getStatusCode();
-		
-			if ($statusCode == '401')
+		} catch (ClientException $e) {
+			$errorResponse = $e->getResponse();
+			$statusCode = $errorResponse->getStatusCode();
+			
+			if ($statusCode == 401)
 			{
 		
 				$response = $client->post(self::MEMBERSHIPURI, array(
@@ -107,7 +108,7 @@ class Membership  {
 						'body'          => $mJson,
 						'verify' 		=> false
 				));
-			} else if ($statusCode != '200') {
+			} else if ($statusCode != 200) {
 				return ApiException::errorMessage($statusCode);
 			}
 		
@@ -123,18 +124,19 @@ class Membership  {
 			try{
 				$response = $client->request('GET', $mid, array(
 							'headers'       => $this->getBaseHeaders(),
-						'verify' 		=> false
+						    'verify' 		=> false
 				));
-			} catch (RequestException $e) {
-		
-				$statusCode = $e->getResponse()->getStatusCode();
-				if ($statusCode == '401')
+			} catch (ClientException $e) {
+				$errorResponse = $e->getResponse();
+				$statusCode = $errorResponse->getStatusCode();
+				
+				if ($statusCode == 401)
 				{
 					$response = $client->request('get', $mid, array(
 							'headers' => $this->getRefreshHeaders(),
 							'verify' 		=> false
 					));
-				} else if ($statusCode != '200') {
+				} else if ($statusCode != 200) {
 					return ApiException::errorMessage($statusCode);
 				}
 		
@@ -153,19 +155,20 @@ class Membership  {
 			$response = $client->request('PUT', $mid, array(
 					'headers'   => $this->getBaseHeaders(),
 					'body'		=> $mJson,
-					'verify' 		=> false
+					'verify' 	=> false
 			));
-		} catch (RequestException $e) {
-		
-			$statusCode = $e->getResponse()->getStatusCode();
-			if ($statusCode == '401')
+		} catch (ClientException $e) {
+			$errorResponse = $e->getResponse();
+			$statusCode = $errorResponse->getStatusCode();
+			
+			if ($statusCode == 401)
 			{
 				$response = $client->request('PUT', $mid, array(
 						'headers' => $this->getRefreshHeaders(),
 						'body'	  => $mJson,
-						'verify' 		=> false
+						'verify'  => false
 				));
-			} else if ($statusCode != '200') {
+			} else if ($statusCode != 200) {
 				return ApiException::errorMessage($statusCode);
 			}
 		
@@ -180,18 +183,19 @@ class Membership  {
 		try{
 			$response = $client->request('DELETE', $mid, array(
 						'headers'   => $this->getBaseHeaders(),
-					'verify' 		=> false
+					    'verify' 		=> false
 			));
-		} catch (RequestException $e) {
-		
-			$statusCode = $e->getResponse()->getStatusCode();
-			if ($statusCode == '401')
+		} catch (ClientException $e) {
+			$errorResponse = $e->getResponse();
+			$statusCode = $errorResponse->getStatusCode();
+			
+			if ($statusCode == 401)
 			{
 				$response = $client->request('DELETE', $mid, array(
 						'headers' => $this->getRefreshHeaders(),
 						'verify' 		=> false
 				));
-			} else if ($statusCode != '204') {
+			} else if ($statusCode != 204) {
 				return ApiException::errorMessage($statusCode);
 			}
 		

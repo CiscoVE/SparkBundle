@@ -2,7 +2,7 @@
 namespace CiscoSystems\SparkBundle\Event;
 
 use \GuzzleHttp\Client;
-use \GuzzleHttp\Exception\RequestException;
+use \GuzzleHttp\Exception\ClientException;
 use CiscoSystems\SparkBundle\Authentication\Oauth;
 use CiscoSystems\SparkBundle\Exception\ApiException;
 
@@ -44,11 +44,11 @@ class Message  {
 					'query'         => $queryParams,
 					'verify' 		=> false
 			));
-		} catch (RequestException $e) {
-		
-			$statusCode = $e->getResponse()->getStatusCode();
-		
-			if ($statusCode == '401')
+		} catch (ClientException $e) {
+			$errorResponse = $e->getResponse();
+			$statusCode = $errorResponse->getStatusCode();
+			
+			if ($statusCode == 401)
 			{
 		
 				$response = $client->request("GET", self::MESSAGESURI, array(
@@ -56,7 +56,7 @@ class Message  {
 						'query'         => $queryParams,
 						'verify' 		=> false
 				));
-			} else if ($statusCode != '200') {
+			} else if ($statusCode != 200) {
 				return ApiException::errorMessage($statusCode);
 			}
 		
@@ -94,11 +94,11 @@ class Message  {
 					'body'          => $mJson,
 					'verify' 		=> false
 			));
-		} catch (RequestException $e) {
-		
-			$statusCode = $e->getResponse()->getStatusCode();
-		
-			if ($statusCode == '401')
+		} catch (ClientException $e) {
+			$errorResponse = $e->getResponse();
+			$statusCode = $errorResponse->getStatusCode();
+			
+			if ($statusCode == 401)
 			{
 		
 				$response = $client->request("POST", self::MESSAGESURI, array(
@@ -106,7 +106,7 @@ class Message  {
 						'body'          => $mJson,
 						'verify' 		=> false
 				));
-			} else if ($statusCode != '200') {
+			} else if ($statusCode != 200) {
 				return ApiException::errorMessage($statusCode);
 			}
 		
@@ -123,16 +123,17 @@ class Message  {
 					'headers'       => $this->getBaseHeaders(),
 					'verify' 		=> false
 			));
-		} catch (RequestException $e) {
-	
-			$statusCode = $e->getResponse()->getStatusCode();
-			if ($statusCode == '401')
+		} catch (ClientException $e) {
+			$errorResponse = $e->getResponse();
+			$statusCode = $errorResponse->getStatusCode();
+			
+			if ($statusCode == 401)
 			{
 				$response = $client->request('GET', $mid, array(
 						'headers'       => $this->getRefreshHeaders(),
 						'verify' 		=> false
 				));
-			} else if ($statusCode != '200') {
+			} else if ($statusCode != 200) {
 				return ApiException::errorMessage($statusCode);
 			}
 	
@@ -151,16 +152,17 @@ class Message  {
 					'headers'       => $this->getBaseHeaders(),
 					'verify' 		=> false
 			));
-		} catch (RequestException $e) {
-	
-			$statusCode = $e->getResponse()->getStatusCode();
-			if ($statusCode == '401')
+		} catch (ClientException $e) {
+			$errorResponse = $e->getResponse();
+			$statusCode = $errorResponse->getStatusCode();
+			
+			if ($statusCode == 401)
 			{
 				$response = $client->request('DELETE', $mid, array(
 						'headers'       => $this->getRefreshHeaders(),
 						'verify' 		=> false
 				));
-			} else if ($statusCode != '204') {
+			} else if ($statusCode != 204) {
 				return ApiException::errorMessage($statusCode);
 			}
 	
