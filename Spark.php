@@ -53,14 +53,16 @@ class Spark
 		if ('' == $defaultUserEmail)
 		{ return "Add a default user, or this room will not be accessible"; }
 		
-		$room = $this->room->createRoom($title);
+		$r	   = $this->room->createRoom($title);
+		$room  = json_decode($r->getBody());
 		
 		if ($room->id)
 		{
 			if ('' != $defaultUserEmail){
 			$memberOptions = array();
 		    $memberOptions['personEmail'] = $defaultUserEmail;
-		    $addMember = $this->membership->createMembership($room->id, $memberOptions );
+		    $am	   		= $this->membership->createMembership($room->id, $memberOptions );
+		    $addMember  = json_decode($am->getBody());
 			}
 		    
 			if (isset($addMember->id) && $moderated == TRUE){
@@ -81,12 +83,14 @@ class Spark
 	    if ('' != $personEmail){
 	    	$membershipOptions['personEmail'] = $personEmail;
 	    } else {
-	    	$membershipOptions['personId']    = $this->oauth->getMachineId();
+	    	$membershipOptions['personId']    = $this->oauth->getStoredMachineUid();
 	    }
 	    
 		$membershipArray = $this->membership->getMembership($membershipOptions);
-		$membershipId    = $membershipArray->items[0]->id;
-		$lockResponse    = $this->membership->updateMembership($membershipId, TRUE);
+		$membershipObj   = json_decode($membershipArray->getBody());
+		$membershipId    = $membershipObj->items[0]->id;
+		$lr              = $this->membership->updateMembership($membershipId, TRUE);
+		$lockResponse    = json_decode($lr->getBody());
 	    return $lockResponse;
 	}
 	
@@ -100,12 +104,14 @@ class Spark
 		if ('' != $personEmail){
 			$membershipOptions['personEmail'] = $personEmail;
 		} else {
-			$membershipOptions['personId']    = $this->oauth->getMachineId();
+			$membershipOptions['personId']    = $this->oauth->getStoredMachineUid();
 		}
 		 
 		$membershipArray = $this->membership->getMembership($membershipOptions);
-		$membershipId    = $membershipArray->items[0]->id;
-		$lockResponse    = $this->membership->updateMembership($membershipId, FALSE);        
+		$membershipObj   = json_decode($membershipArray->getBody());
+		$membershipId    = $membershipObj->items[0]->id;
+		$lr              = $this->membership->updateMembership($membershipId, FALSE);
+		$lockResponse    = json_decode($lr->getBody());
 		return $lockResponse;
 	}
 	
@@ -115,7 +121,8 @@ class Spark
 	public function getConversation($sparkId = '', $options = array())
 	{
 		
-		$getMessages = $this->message->getMessages($sparkId, $options );
+		$messageObject = $this->message->getMessages($sparkId, $options );
+		$getMessages   = json_decode($messageObject->getBody());
 		
 		if (isset($getMessages->items) && count($getMessages->items) > 0)
 		{
@@ -125,9 +132,12 @@ class Spark
 				if (isset($items->text) && $items->text != '')
 				{
 					$convo = array();
+					$convo['id']			= $items->id;
 					$convo['text'] 			= $items->text;
 					$convo['created'] 		= $items->created;
+					$convo['personId'] 		= $items->personId;
 					$convo['personEmail'] 	= $items->personEmail;
+					$convo['roomType'] 		= $items->roomType;
 				$output[] = $convo;
 				}
 			}
@@ -138,7 +148,8 @@ class Spark
 	}
 	
 	public function renameRoom($sparkId = null, $roomName = null){
-		$renameRoom = $this->room->updateRoom( $sparkId, $roomName );
+		$renameRoomObj = $this->room->updateRoom( $sparkId, $roomName );
+		$renameRoom    = json_decode($renameRoomObj->getBody());
 	
 		return $renameRoom;
 	}
@@ -150,7 +161,8 @@ class Spark
 	 */
 	public function addSingleSparkUser( $sparkId, $newUserOptions = array()){
 		
-		return $this->membership->createMembership( $sparkId, $newUserOptions);
+		$createMemberObject =  $this->membership->createMembership( $sparkId, $newUserOptions);
+		return                 json_decode($createMemberObject->getBody());
 	
 	}
 	
@@ -172,37 +184,60 @@ class Spark
 		}
 
 		$removeUser = array();
-		$mid = $this->membership->getMembership($memberOptions);		
+		$midObj = $this->membership->getMembership($memberOptions);	
+		$mid    = json_decode($midObj->getBody());
 		if (isset($mid->items[0]->id) )
 		{
-			$removeUser = $this->membership->deleteMembership($mid->items[0]->id);			
+			$removeUserObj = $this->membership->deleteMembership($mid->items[0]->id);
+			$removeUser    = json_decode($removeUserObj->getBody());
+			
 		}
 		return $removeUser;
 	}
 	
 	public function getParticipants($sparkId){
-        
-		$options = array();
-		$options['roomId'] = $sparkId;
 		
-		$m = $this->membership->getMembership($options);
+		$result     = array();
+		$cursor     = NULL;
+		$max	    = 200;
+		$spark     	= $this->membership;
 		
 		
-		if (isset($m->items) && count($m->items) > 0){
-			return $m->items;				
-		} 
+		do {
 		
-		return $m;
+			$member = $spark->getMembership(array("roomId" => $sparkId, "cursor" => $cursor, "max" => $max));
+			if (isset($member->statusCode)){
+				return new Response(array('status'=> $member->statusCode, 'errorMessage' => $member->statusMessage));
+			} else {
+				if ($member->hasHeader('link')){
+					$linkarray = $member->getHeader('link')[0];
+					preg_match('~cursor=(.*?)>~', $linkarray, $output);
+					$cursor = $output[1];
+						
+					$body   = json_decode($member->getBody());
+					$result = array_merge($result,$body->items);
+				} else {
+					$body   = json_decode($member->getBody());
+					$result = $body->items;
+				}
+					
+					
+			}
+		} while ($member->hasHeader('link'));
+		
+		
+	return new Response(json_encode($result));
 	}
 	
 	public function getMachineUserId()
 	{
-		return $this->oauth->getMachineId();
+		return $this->oauth->getMachinePersonId();
 	}
 	
 	public function getDisplayName($pid)
 	{
-		$p = $this->people->getPersonDetail($pid);
+		$pObj = $this->people->getPersonDetail($pid);
+		$p    = json_decode($pObj->getBody());
 		return json_encode($p->displayName);
 	}
 
