@@ -19,7 +19,7 @@ class Configuration implements ConfigurationInterface
     	     ->scalarNode( 'machine_secret' )->end()
     	     ->scalarNode( 'machine_org' )->end()
     	     ->scalarNode( 'client_id' )->isRequired()->end()
-    	     ->scalarNode( 'client_secret' )->isRequired()->end()
+    	     ->scalarNode( 'client_secret' )->end()
     	     ->scalarNode( 'redirect_url' )->end();
     	
     	return $treeBuilder;
