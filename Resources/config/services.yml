@@ -7,7 +7,7 @@ parameters:
     cisco.spark.message.class:        CiscoSystems\SparkBundle\Event\Message
     cisco.spark.people.class:         CiscoSystems\SparkBundle\Event\People
     cisco.spark.webhook.class:        CiscoSystems\SparkBundle\Event\WebHook
-    cisco.spark.class:                CiscoSystems\SparkBundle\Spark
+    cisco.spark.class:                CiscoSystems\SparkBundle\Common\Spark
     
 services:
     cisco.spark.oauth:

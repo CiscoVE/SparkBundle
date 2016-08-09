@@ -1,6 +1,6 @@
 <?php
 
-namespace CiscoSystems\SparkBundle;
+namespace CiscoSystems\SparkBundle\Common;
 
 use CiscoSystems\SparkBundle\Event\Room;
 use CiscoSystems\SparkBundle\Event\Team;
