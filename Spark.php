@@ -3,7 +3,9 @@
 namespace CiscoSystems\SparkBundle;
 
 use CiscoSystems\SparkBundle\Event\Room;
+use CiscoSystems\SparkBundle\Event\Team;
 use CiscoSystems\SparkBundle\Event\Membership;
+use CiscoSystems\SparkBundle\Event\TeamMembership;
 use CiscoSystems\SparkBundle\Event\Message;
 use CiscoSystems\SparkBundle\Event\People;
 use CiscoSystems\SparkBundle\Event\WebHook;
@@ -15,21 +17,25 @@ class Spark
 {
 
 	protected $room;
+	protected $team;
 	protected $membership;
+	protected $teammembership;
 	protected $message;
 	protected $people;
 	protected $webhook;
 	protected $oauth;
 	
 	
-	public function __construct( Room $room, Membership $membership, Message $message, People $people, WebHook $webhook, Oauth $oauth )
+	public function __construct( Room $room, Team $team, Membership $membership, TeamMembership $teammembership, Message $message, People $people, WebHook $webhook, Oauth $oauth )
 	{
-		$this->room    		= $room;
-		$this->membership   = $membership;
-		$this->message      = $message;
-		$this->people       = $people;
-		$this->webhook      = $webhook;
-		$this->oauth        = $oauth;
+		$this->room    			= $room;
+		$this->team				= $team;
+		$this->membership   	= $membership;
+		$this->teammembership 	= $teammembership;
+		$this->message      	= $message;
+		$this->people       	= $people;
+		$this->webhook      	= $webhook;
+		$this->oauth        	= $oauth;
 	
 	}
 	

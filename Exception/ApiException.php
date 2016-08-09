@@ -42,6 +42,9 @@ class ApiException extends Exception
 			case 503:
 				return (object)array("statusCode" => 503, "statusMessage" => "Server is overloaded with requests. Try again later.");
 				break;
+			case 999:
+				return (object)array("statusCode" => 999, "statusMessage" => "No Options values were passed to the API.");
+				break;
 		}
 
 	}

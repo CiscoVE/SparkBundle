@@ -1,11 +1,13 @@
 parameters:
-    cisco.spark.oauth.class:       CiscoSystems\SparkBundle\Authentication\Oauth
-    cisco.spark.room.class:        CiscoSystems\SparkBundle\Event\Room
-    cisco.spark.membership.class:  CiscoSystems\SparkBundle\Event\Membership
-    cisco.spark.message.class:     CiscoSystems\SparkBundle\Event\Message
-    cisco.spark.people.class:      CiscoSystems\SparkBundle\Event\People
-    cisco.spark.webhook.class:     CiscoSystems\SparkBundle\Event\WebHook
-    cisco.spark.class:             CiscoSystems\SparkBundle\Spark
+    cisco.spark.oauth.class:          CiscoSystems\SparkBundle\Authentication\Oauth
+    cisco.spark.room.class:           CiscoSystems\SparkBundle\Event\Room
+    cisco.spark.team.class:           CiscoSystems\SparkBundle\Event\Team
+    cisco.spark.membership.class:     CiscoSystems\SparkBundle\Event\Membership
+    cisco.spark.teammembership.class: CiscoSystems\SparkBundle\Event\TeamMembership
+    cisco.spark.message.class:        CiscoSystems\SparkBundle\Event\Message
+    cisco.spark.people.class:         CiscoSystems\SparkBundle\Event\People
+    cisco.spark.webhook.class:        CiscoSystems\SparkBundle\Event\WebHook
+    cisco.spark.class:                CiscoSystems\SparkBundle\Spark
     
 services:
     cisco.spark.oauth:
@@ -17,8 +19,16 @@ services:
         class: '%cisco.spark.room.class%'
         arguments:
             - '@cisco.spark.oauth'
+    cisco.spark.team:
+        class: '%cisco.spark.team.class%'
+        arguments:
+            - '@cisco.spark.oauth'
     cisco.spark.membership:
         class: '%cisco.spark.membership.class%'
+        arguments:
+            - '@cisco.spark.oauth'
+    cisco.spark.teammembership:
+        class: '%cisco.spark.teammembership.class%'
         arguments:
             - '@cisco.spark.oauth'
     cisco.spark.message:
@@ -37,7 +47,9 @@ services:
         class: '%cisco.spark.class%'
         arguments:
             - '@cisco.spark.room'
+            - '@cisco.spark.team'
             - '@cisco.spark.membership'
+            - '@cisco.spark.teammembership'
             - '@cisco.spark.message'
             - '@cisco.spark.people'
             - '@cisco.spark.webhook'

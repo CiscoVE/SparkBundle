@@ -6,44 +6,38 @@ use \GuzzleHttp\Exception\ClientException;
 use CiscoSystems\SparkBundle\Authentication\Oauth;
 use CiscoSystems\SparkBundle\Exception\ApiException;
 
+class Team  {
 
-class Room  {
-	
-	CONST ROOMURI   = 'https://api.ciscospark.com/v1/rooms/';
-	
+	CONST TEAMURI   = 'https://api.ciscospark.com/v1/teams/';
+
 	protected $oauth;
-	
+
 	public function __construct( Oauth $oauth )
 	{
 		$this->oauth    = $oauth;
 	}
-	
+
 	public function getBaseHeaders()
 	{
-		return array('Authorization' => $this->oauth->getStoredToken(),'content-type'  => 'application/json');		
+		return array('Authorization' => $this->oauth->getStoredToken(),'content-type'  => 'application/json');
 	}
-	
+
 	public function getRefreshHeaders()
 	{
 		return array('Authorization' => $this->oauth->getNewToken(),'content-type'  => 'application/json');
 	}
+
 	
-	public function getRooms($options = array())
+	public function getTeams($options = array())
 	{
 		if (sizeOf($options) < 1)
 		{
 			return ApiException::errorMessage(999);
 		}
-		/*$queryParams = array();
-		if (isset($options['type'])) 	{ $queryParams['type'] 		= $options['type']; }
-		if (isset($options['max'])) 	{ $queryParams['max'] 		= $options['max']; }
-		if (isset($options['cursor'])) 	{ $queryParams['cursor'] 	= $options['cursor']; }
-		if (isset($options['teamid'])) 	{ $queryParams['teamId'] 	= $options['teamid']; }
-		*/
 	
 		$client  = new Client();
 		try{
-			$response = $client->request("GET", self::ROOMURI, array(
+			$response = $client->request("GET", self::TEAMURI, array(
 					'headers'       => $this->getBaseHeaders(),
 					'query'         => $options,
 					'verify' 		=> false
@@ -51,11 +45,11 @@ class Room  {
 		} catch (ClientException $e) {
 			$errorResponse = $e->getResponse();
 			$statusCode = $errorResponse->getStatusCode();
-			
+				
 			if ($statusCode == 401)
 			{
 	
-				$response = $client->request("GET", self::ROOMURI, array(
+				$response = $client->request("GET", self::TEAMURI, array(
 						'headers'       => $this->getRefreshHeaders(),
 						'query'         => $queryParams,
 						'verify' 		=> false
@@ -68,66 +62,65 @@ class Room  {
 		return $response;
 	}
 	
-	public function createRoom($options = array())
+	public function createTeam($options = array())
 	{
-		
+	
 		if (sizeOf($options) < 1)
 		{
 			return ApiException::errorMessage(999);
 		}
 		$roomJson = json_encode($options);
-		
+	
 		$client      = new Client();
 		try{
-			$response = $client->request("POST", self::ROOMURI, array(
+			$response = $client->request("POST", self::TEAMURI, array(
 					'headers'    => $this->getBaseHeaders(),
-					'body'       => $roomJson,				
+					'body'       => $roomJson,
 					'verify'     => false
 			));
 		} catch (ClientException $e) {
 			$errorResponse = $e->getResponse();
 			$statusCode = $errorResponse->getStatusCode();
-			
+				
 			if ($statusCode == 401)
 			{
-				$response = $client->request("POST", self::ROOMURI, array(
+				$response = $client->request("POST", self::TEAMURI, array(
 						'headers'    => $this->getRefreshHeaders(),
 						'body'       => $roomJson,
 						'verify'     => false
 				));
-			
-          	
+					
+				 
 			} else if ($statusCode != 200) {
 				return ApiException::errorMessage($statusCode);
 			}
-
+	
 		}
-		
+	
 		return $response;
 	}
 	
-	public function getRoomDetails($rid = null, $showSipAddress = 'FALSE')
+	
+	public function getTeamDetails($tid = null)
 	{
-		$queryParams    = array('showSipAddress' => $showSipAddress );
-		
-		$client = new Client(['base_uri' => self::ROOMURI]);
-		
+	
+	
+		$client = new Client(['base_uri' => self::TEAMURI]);
+	
 		try{
-			$response = $client->request('GET', $rid, array(
-				'headers'       => $this->getBaseHeaders(),
-				'query'         => $queryParams,
-				'verify' 		=> false
+			$response = $client->request('GET', $tid, array(
+					'headers'       => $this->getBaseHeaders(),		
+					'verify' 		=> false
 			));
 		} catch (ClientException $e) {
 			$errorResponse = $e->getResponse();
 			$statusCode = $errorResponse->getStatusCode();
-			
+				
 			if ($statusCode == 401)
 			{
-				$response = $client->request('GET', $rid, array(
-				'headers'       => $this->getRefreshHeaders(),
-				'query'         => $queryParams,
-				'verify' 		=> false
+				$response = $client->request('GET', $tid, array(
+						'headers'       => $this->getRefreshHeaders(),
+						'verify' 		=> false
 				));
 			} else if ($statusCode != 200) {
 				return ApiException::errorMessage($statusCode);
@@ -137,14 +130,14 @@ class Room  {
 	
 		return $response;
 	}
-    
-	public function updateRoom( $rid = null, $title = 'Default Room Title' )
+	
+	public function updateTeam( $tid = null, $title = 'Default Team Name' )
 	{
-		$roomJson = '{"title":"'.$title.'"}';
-		$client   = new Client(['base_uri' => self::ROOMURI]);
-		
+		$roomJson = '{"name":"'.$title.'"}';
+		$client   = new Client(['base_uri' => self::TEAMURI]);
+	
 		try{
-			$response = $client->request('PUT', $rid, array(
+			$response = $client->request('PUT', $tid, array(
 					'headers'       => $this->getBaseHeaders(),
 					'body'          => $roomJson,
 					'verify' 		=> false
@@ -152,10 +145,10 @@ class Room  {
 		} catch (ClientException $e) {
 			$errorResponse = $e->getResponse();
 			$statusCode = $errorResponse->getStatusCode();
-			
+				
 			if ($statusCode == 401)
 			{
-				$response = $client->request('PUT', $rid, array(
+				$response = $client->request('PUT', $tid, array(
 						'headers' => $this->getRefreshHeaders(),
 						'body'    => $roomJson,
 						'verify'  => false
@@ -163,27 +156,27 @@ class Room  {
 			} else if ($statusCode != 200) {
 				return ApiException::errorMessage($statusCode);
 			}
-		
+	
 		}
 		return $response;
 	}
 	
-	public function deleteRoom( $rid = null )
+	public function deleteTeam( $tid = null )
 	{
-		$client   = new Client(['base_uri' => self::ROOMURI]);
+		$client   = new Client(['base_uri' => self::TEAMURI]);
 	
 		try{
-			$response = $client->request('DELETE', $rid, array(
+			$response = $client->request('DELETE', $tid, array(
 					'headers'       => $this->getBaseHeaders(),
 					'verify' 		=> false
 			));
 		} catch (ClientException $e) {
 			$errorResponse = $e->getResponse();
 			$statusCode = $errorResponse->getStatusCode();
-			
+				
 			if ($statusCode == 401)
 			{
-				$response = $client->request('DELETE', $rid, array(
+				$response = $client->request('DELETE', $tid, array(
 						'headers' => $this->getRefreshHeaders(),
 						'verify' 		=> false
 				));
@@ -194,5 +187,8 @@ class Room  {
 		}
 		return $response;
 	}
-
+	
+	
+	
+	
 }
