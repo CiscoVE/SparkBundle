@@ -17,7 +17,6 @@ class Room  {
 	public function __construct( Oauth $oauth )
 	{
 		$this->oauth    = $oauth;
-		
 	}
 	
 	public function getBaseHeaders()
@@ -69,20 +68,26 @@ class Room  {
 		$roomJson = '{"title":"'.$title.'"}';
 		
 		$client      = new Client();
-		$baseRequest = new \GuzzleHttp\Psr7\Request("POST", self::ROOMURI, $this->getBaseHeaders() , $roomJson );
-		
 		try{
-			$response = $client->send($baseRequest);
+			$response = $client->request("POST", self::ROOMURI, array(
+					'headers'    => $this->getBaseHeaders(),
+					'body'       => $roomJson,				
+					'verify'     => false
+			));
 		} catch (ClientException $e) {
 			$errorResponse = $e->getResponse();
 			$statusCode = $errorResponse->getStatusCode();
 			
 			if ($statusCode == 401)
 			{
-	
-          	$request  = $baseRequest->withHeader('Authorization', $this->oauth->getNewToken());
-          	$response = $client->send($request);
-          	} else if ($statusCode != 200) {
+				$response = $client->request("POST", self::ROOMURI, array(
+						'headers'    => $this->getRefreshHeaders(),
+						'body'       => $roomJson,
+						'verify'     => false
+				));
+			
+          	
+			} else if ($statusCode != 200) {
 				return ApiException::errorMessage($statusCode);
 			}
 
@@ -143,7 +148,7 @@ class Room  {
 				$response = $client->request('PUT', $rid, array(
 						'headers' => $this->getRefreshHeaders(),
 						'body'    => $roomJson,
-						'verify' 		=> false
+						'verify'  => false
 				));
 			} else if ($statusCode != 200) {
 				return ApiException::errorMessage($statusCode);
