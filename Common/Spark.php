@@ -10,6 +10,7 @@ use CiscoSystems\SparkBundle\Event\Message;
 use CiscoSystems\SparkBundle\Event\People;
 use CiscoSystems\SparkBundle\Event\WebHook;
 use CiscoSystems\SparkBundle\Authentication\Oauth;
+use CiscoSystems\SparkBundle\Exception\ApiException;
 
 /* The Spark Class is meant to store common actions which might be performed through the API */
 
@@ -54,6 +55,10 @@ class Spark
 		{ return "Add a default user, or this room will not be accessible"; }
 		
 		$r	   = $this->room->createRoom($title);
+		if (isset($r->statusCode))
+		{
+			return new Response(array('status'=> 'error', 'errorMessage' => 'Add Room: ' . $r->statusMessage));
+		}
 		$room  = json_decode($r->getBody());
 		
 		if ($room->id)
@@ -62,6 +67,10 @@ class Spark
 			$memberOptions = array();
 		    $memberOptions['personEmail'] = $defaultUserEmail;
 		    $am	   		= $this->membership->createMembership($room->id, $memberOptions );
+		    if (isset($am->statusCode))
+		    {
+		    	return new Response(array('status'=> 'error', 'errorMessage' => 'Create Membership: ' . $am->statusMessage));
+		    }
 		    $addMember  = json_decode($am->getBody());
 			}
 		    
@@ -87,9 +96,17 @@ class Spark
 	    }
 	    
 		$membershipArray = $this->membership->getMembership($membershipOptions);
+		if (isset($membershipArray->statusCode))
+		{
+			return new Response(array('status'=> 'error', 'errorMessage' => 'Lock -> Create Membership: ' . $membershipArray->statusMessage));
+		}
 		$membershipObj   = json_decode($membershipArray->getBody());
 		$membershipId    = $membershipObj->items[0]->id;
 		$lr              = $this->membership->updateMembership($membershipId, TRUE);
+		if (isset($lr->statusCode))
+		{
+			return new Response(array('status'=> 'error', 'errorMessage' => 'Lock -> Update Membership: ' . $lr->statusMessage));
+		}
 		$lockResponse    = json_decode($lr->getBody());
 	    return $lockResponse;
 	}
