@@ -10,7 +10,6 @@ use CiscoSystems\SparkBundle\Event\Message;
 use CiscoSystems\SparkBundle\Event\People;
 use CiscoSystems\SparkBundle\Event\WebHook;
 use CiscoSystems\SparkBundle\Authentication\Oauth;
-use CiscoSystems\SparkBundle\Exception\ApiException;
 
 /* The Spark Class is meant to store common actions which might be performed through the API */
 
