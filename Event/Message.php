@@ -64,13 +64,17 @@ class Message  {
 		return $response;
 	}
 	
-	public function createMessage($roomId = '', $text = '', $files = array(), $file = '', $toPersonId = '', $toPersonEmail = '')
+	public function createMessage($roomId = '', $text = '', $markdown = false, $files = array(), $file = '', $toPersonId = '', $toPersonEmail = '')
 	{
-		$requestArray = array();
-		$requestArray["roomId"] 		= $roomId;
-		if ('' != $text){ 
-			$requestArray["text"]   	= $text; 
-		}
+	    $requestArray = array();
+	    $requestArray["roomId"] 		= $roomId;
+	    if ('' != $text){
+	        if (!$markdown){
+	            $requestArray["text"]   	= $text;
+	        } else {
+	            $requestArray["markdown"]   	= $text;
+	        }
+	    }
 		if (count($files) > 0){
 			$requestArray["files"]   	= $files; /* must be an array array("url","url2","url3") */
 		}
