@@ -27,7 +27,7 @@ class Message  {
 	{
 		return array('Authorization' => $this->oauth->getNewToken(),'content-type'  => 'application/json');
 	}
-	
+
 	/* options should be in key => value array.  Options are before,beforeMessage,max */
 	public function getMessages($roomId = '', $options = array() )
 	{
@@ -116,6 +116,24 @@ class Message  {
 		
 		}
 		return $response;		
+	}
+	
+	public function createMultipartMessage($multipart = null)
+	{
+
+	    $client  = new Client();
+	    try{
+	        $response = $client->request("POST", self::MESSAGESURI, array(
+	            'headers'       => array('Authorization' => $this->oauth->getStoredToken(),'content-type' => $multipart->contentType()),
+	            'body'          => $multipart->data(),
+	            'verify' 	   => false
+	        ));
+	    } catch (ClientException $e) {
+	        $errorResponse = $e->getResponse();
+	        $statusCode = $errorResponse->getStatusCode();
+	        return ApiException::errorMessage($statusCode); 
+	    }
+	    return $response;		
 	}
 	
 	public function getMessageDetails($mid = null)
