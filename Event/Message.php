@@ -193,6 +193,37 @@ class Message  {
 		return $response;
 	}
 	
+	public function getMessageFile($fileUrl = null)
+	{
+	    $resource = fopen('/tmp/sparkfile', 'w');
+	    
+	    $client = new Client();
+	    
+	    try{
+	        $response = $client->request('GET', $fileUrl, array(
+	            'headers'       => $this->getBaseHeaders(),
+	            'verify' 	   => false,
+	            'sink'          => $resource
+	        )); 
+	    } catch (ClientException $e) {
+	        $errorResponse = $e->getResponse();
+	        $statusCode = $errorResponse->getStatusCode();
+	        
+	        if ($statusCode == 401)
+	        {
+	            $response = $client->request('GET', $fileUrl, array(
+	                'headers'       => $this->getRefreshHeaders(),
+	                'verify' 	   => false,
+	                'sink'          => $resource
+	            ));
+	        } else if ($statusCode != 200) {
+	            return ApiException::errorMessage($statusCode);
+	        }
+	        
+	    }
+	    return $response;
+	}
+	
 	
 	
 }
