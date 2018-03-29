@@ -56,8 +56,8 @@ class Message  {
 						'query'         => $queryParams,
 						'verify' 		=> false
 				));
-			} else if ($statusCode != 200) {
-				return ApiException::errorMessage($statusCode);
+			} else {
+				 return $errorResponse;
 			}
 		
 		}
@@ -110,8 +110,8 @@ class Message  {
 						'body'          => $mJson,
 						'verify' 		=> false
 				));
-			} else if ($statusCode != 200) {
-				return ApiException::errorMessage($statusCode);
+			} else {
+				 return $errorResponse;
 			}
 		
 		}
@@ -131,7 +131,7 @@ class Message  {
 	    } catch (ClientException $e) {
 	        $errorResponse = $e->getResponse();
 	        $statusCode = $errorResponse->getStatusCode();
-	        return ApiException::errorMessage($statusCode); 
+	        return $errorResponse; 
 	    }
 	    return $response;		
 	}
@@ -155,8 +155,8 @@ class Message  {
 						'headers'       => $this->getRefreshHeaders(),
 						'verify' 		=> false
 				));
-			} else if ($statusCode != 200) {
-				return ApiException::errorMessage($statusCode);
+			} else {
+				 return $errorResponse;
 			}
 	
 		}	
@@ -184,8 +184,8 @@ class Message  {
 						'headers'       => $this->getRefreshHeaders(),
 						'verify' 		=> false
 				));
-			} else if ($statusCode != 204) {
-				return ApiException::errorMessage($statusCode);
+			} else {
+				return $errorResponse;
 			}
 	
 		}
@@ -216,9 +216,9 @@ class Message  {
 	                'verify' 	   => false,
 	                'sink'          => $resource
 	            ));
-	        } else if ($statusCode != 200) {
-	            return ApiException::errorMessage($statusCode);
-	        }
+	        } else {
+		     return $errorResponse;
+		}
 	        
 	    }
 	    return $response;
